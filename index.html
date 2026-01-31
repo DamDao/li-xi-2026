@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="vi" class="h-full">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lộc Xuân - Gửi Trao Yêu Thương</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/_sdk/element_sdk.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Be+Vietnam+Pro:wght@300;400;500;600&amp;display=swap"
+        rel="stylesheet" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700;900&display=swap"
+        rel="stylesheet" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link href="src/css/style.css" rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "tet-red": "#8B0000",
+                        "tet-red-light": "#B22222",
+                        "tet-gold": "#FFD700",
+                        "tet-gold-dark": "#DAA520",
+                        "tet-cream": "#FFF8DC",
+                    },
+                    fontFamily: {
+                        heading: ["Playfair Display", "serif"],
+                        body: ["Be Vietnam Pro", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        /* Thêm vào phần <head> */
+        .font-dancing {
+            font-family: 'Dancing Script', cursive;
+        }
+        
+        /* Animation cho scratch overlay */
+        .scratched {
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        /* Animation cho money reveal */
+        .money-reveal {
+            animation: moneyPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        @keyframes moneyPop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+    <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+</head>
+
+<body class="h-full font-body">
+    <div id="app-wrapper" class="h-full w-full overflow-auto bg-pattern relative">
+        <!-- Decorative Elements -->
+        <div class="absolute top-4 left-4 text-4xl lantern opacity-80">🏮</div>
+        <div class="absolute top-4 right-4 text-4xl lantern opacity-80" style="animation-delay: -2s">
+            🏮
+        </div>
+        <div class="absolute top-20 left-1/4 text-2xl floating opacity-60">
+            🌸
+        </div>
+        <div class="absolute top-32 right-1/4 text-xl floating opacity-50" style="animation-delay: -1s">
+            ✨
+        </div>
+        <div class="absolute bottom-20 left-16 text-3xl floating opacity-70" style="animation-delay: -3s">
+            🎋
+        </div>
+        <div class="absolute bottom-32 right-20 text-2xl floating opacity-60" style="animation-delay: -2s">
+            🌺
+        </div>
+        <!-- Sparkle decorations -->
+        <div class="absolute top-1/4 left-10 w-2 h-2 bg-tet-gold rounded-full sparkle"></div>
+        <div class="absolute top-1/3 right-16 w-1.5 h-1.5 bg-tet-gold rounded-full sparkle"
+            style="animation-delay: -0.5s"></div>
+        <div class="absolute bottom-1/4 left-20 w-2 h-2 bg-tet-gold rounded-full sparkle" style="animation-delay: -1s">
+        </div>
+
+        <!-- Main Content -->
+        <div class="min-h-full flex flex-col items-center justify-center px-4 py-8 relative z-10">
+            <!-- Header Section -->
+            <div class="text-center mb-8 md:mb-12">
+                <!-- Tagline -->
+                <p id="tagline" class="text-tet-cream/80 text-sm md:text-base tracking-widest mb-4 font-light">
+                    Gửi trao yêu thương – Nhận lộc an khang
+                </p>
+                <!-- Main Heading -->
+                <h1 id="main-heading" class="font-heading text-3xl md:text-5xl lg:text-6xl font-bold gold-shimmer mb-2">
+                    Người trao đang gửi lộc xuân cho..?
+                </h1>
+                <!-- Decorative line -->
+                <div class="flex items-center justify-center gap-3 mt-4">
+                    <div class="w-16 md:w-24 h-px bg-gradient-to-r from-transparent via-tet-gold to-transparent"></div>
+                    <span class="text-tet-gold text-xl">❀</span>
+                    <div class="w-16 md:w-24 h-px bg-gradient-to-r from-transparent via-tet-gold to-transparent"></div>
+                </div>
+            </div>
+
+            <!-- Cards Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-5xl mx-auto mb-8 md:mb-12">
+                <!-- Card 1: Ông Bà -->
+                <button class="card-envelope rounded-2xl p-4 md:p-6 text-center cursor-pointer group"
+                    data-recipient="ong-ba">
+                    <div class="text-4xl md:text-5xl mb-3 group-hover:scale-110 transition-transform">
+                        👴👵
+                    </div>
+                    <h3 class="font-heading text-tet-gold font-semibold text-lg md:text-xl mb-1">
+                        Ông Bà
+                    </h3>
+                    <p class="text-tet-cream/70 text-xs md:text-sm font-light">
+                        Kính chúc sức khỏe
+                    </p>
+                </button>
+
+                <!-- Card 2: Bố Mẹ -->
+                <button class="card-envelope rounded-2xl p-4 md:p-6 text-center cursor-pointer group"
+                    data-recipient="bo-me">
+                    <div class="text-4xl md:text-5xl mb-3 group-hover:scale-110 transition-transform">
+                        👨‍👩‍👧
+                    </div>
+                    <h3 class="font-heading text-tet-gold font-semibold text-lg md:text-xl mb-1">
+                        Bố Mẹ
+                    </h3>
+                    <p class="text-tet-cream/70 text-xs md:text-sm font-light">
+                        Biết ơn dưỡng dục
+                    </p>
+                </button>
+
+                <!-- Card 3: Anh Chị Em -->
+                <button class="card-envelope rounded-2xl p-4 md:p-6 text-center cursor-pointer group"
+                    data-recipient="anh-chi-em">
+                    <div class="text-4xl md:text-5xl mb-3 group-hover:scale-110 transition-transform">
+                        👫
+                    </div>
+                    <h3 class="font-heading text-tet-gold font-semibold text-lg md:text-xl mb-1">
+                        Anh Chị Em
+                    </h3>
+                    <p class="text-tet-cream/70 text-xs md:text-sm font-light">
+                        Đồng hành bên nhau
+                    </p>
+                </button>
+
+                <!-- Card 4: Con Cái -->
+                <button class="card-envelope rounded-2xl p-4 md:p-6 text-center cursor-pointer group"
+                    data-recipient="con-cai">
+                    <div class="text-4xl md:text-5xl mb-3 group-hover:scale-110 transition-transform">
+                        👶
+                    </div>
+                    <h3 class="font-heading text-tet-gold font-semibold text-lg md:text-xl mb-1">
+                        Con Cái
+                    </h3>
+                    <p class="text-tet-cream/70 text-xs md:text-sm font-light">
+                        Mong con khôn lớn
+                    </p>
+                </button>
+
+                <!-- Card 5: Bạn Bè -->
+                <button class="card-envelope rounded-2xl p-4 md:p-6 text-center cursor-pointer group"
+                    data-recipient="ban-be">
+                    <div class="text-4xl md:text-5xl mb-3 group-hover:scale-110 transition-transform">
+                        🤝
+                    </div>
+                    <h3 class="font-heading text-tet-gold font-semibold text-lg md:text-xl mb-1">
+                        Bạn Bè
+                    </h3>
+                    <p class="text-tet-cream/70 text-xs md:text-sm font-light">
+                        Tri kỷ đồng hành
+                    </p>
+                </button>
+
+                <!-- Card 6: Đồng Nghiệp -->
+                <button class="card-envelope rounded-2xl p-4 md:p-6 text-center cursor-pointer group"
+                    data-recipient="dong-nghiep">
+                    <div class="text-4xl md:text-5xl mb-3 group-hover:scale-110 transition-transform">
+                        💼
+                    </div>
+                    <h3 class="font-heading text-tet-gold font-semibold text-lg md:text-xl mb-1">
+                        Đồng Nghiệp
+                    </h3>
+                    <p class="text-tet-cream/70 text-xs md:text-sm font-light">
+                        Thành công chung
+                    </p>
+                </button>
+
+                <!-- Card 7: Thầy Cô -->
+                <button class="card-envelope rounded-2xl p-4 md:p-6 text-center cursor-pointer group"
+                    data-recipient="thay-co">
+                    <div class="text-4xl md:text-5xl mb-3 group-hover:scale-110 transition-transform">
+                        📚
+                    </div>
+                    <h3 class="font-heading text-tet-gold font-semibold text-lg md:text-xl mb-1">
+                        Thầy Cô
+                    </h3>
+                    <p class="text-tet-cream/70 text-xs md:text-sm font-light">
+                        Ơn dạy dỗ sâu
+                    </p>
+                </button>
+
+                <!-- Card 8: Người Thương -->
+                <button class="card-envelope rounded-2xl p-4 md:p-6 text-center cursor-pointer group"
+                    data-recipient="nguoi-thuong">
+                    <div class="text-4xl md:text-5xl mb-3 group-hover:scale-110 transition-transform">
+                        💕
+                    </div>
+                    <h3 class="font-heading text-tet-gold font-semibold text-lg md:text-xl mb-1">
+                        Người Thương
+                    </h3>
+                    <p class="text-tet-cream/70 text-xs md:text-sm font-light">
+                        Yêu thương trọn đời
+                    </p>
+                </button>
+            </div>
+
+            <!-- Selected Recipient Display -->
+            <div id="selection-display" class="hidden text-center mb-6 animate-pulse">
+                <p class="text-tet-cream text-lg">
+                    Bạn đang gửi lộc xuân đến:
+                    <span id="selected-name" class="text-tet-gold font-semibold"></span>
+                </p>
+            </div>
+
+            <!-- Continue Button -->
+            <button id="continue-btn"
+                class="hidden bg-gradient-to-r from-tet-gold-dark via-tet-gold to-tet-gold-dark text-tet-red font-semibold px-8 py-3 rounded-full text-lg shadow-lg hover:shadow-tet-gold/50 hover:scale-105 transition-all duration-300 mb-8">
+                Chao gửi yêu thương ✨
+            </button>
+
+            <!-- Envelopes Grid (hidden by default) -->
+            <div id="envelopes-container" class="hidden max-w-6xl mx-auto w-full px-4">
+                <div class="text-center mb-8">
+                    <h2 class="font-heading text-2xl md:text-3xl font-bold gold-shimmer mb-4">
+                        24 Bao Lì Xì Yêu Thương
+                    </h2>
+                    <p class="text-tet-cream/70 text-sm md:text-base">
+                        Chọn một bao lì xì để gửi trao yêu thương
+                    </p>
+                </div>
+
+                <div id="envelopes-grid"
+                    class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5 mb-12">
+                    <!-- 24 envelopes will be generated here -->
+                </div>
+
+                <div class="text-center">
+                    <button id="back-btn"
+                        class="bg-tet-red-light text-tet-cream font-medium px-6 py-2 rounded-full hover:bg-tet-red transition-all duration-300">
+                        ← Quay lại chọn mục người nhận
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="text-center">
+                <p id="footer-text" class="font-heading text-tet-gold text-xl md:text-2xl mb-2">
+                    Lộc Xuân 2026
+                </p>
+                <p class="text-tet-cream/60 text-xs md:text-sm font-light tracking-wide">
+                    Trao gửi yêu thương • Đón nhận an khang
+                </p>
+                <div class="flex items-center justify-center gap-2 mt-3 text-tet-gold/90">
+                    <span>🧧</span>
+                    <span class="text-xs">Chúc Mừng Năm Mới</span>
+                    <span>🧧</span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Modal Tâm Thư & Lộc Xuân -->
+    <div id="heart-letter-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/70"></div>
+        <div class="relative bg-gradient-to-br from-red-50 to-amber-50 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border-4 border-tet-gold">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-tet-red to-tet-red-light py-4 px-6 text-center">
+                <h2 class="font-heading text-3xl font-bold text-tet-gold">TÂM THƯ & LỘC XUÂN</h2>
+                <p class="text-tet-cream/90 text-sm mt-1">Xuân Ất Tỵ 2025 - An Khang Thịnh Vượng</p>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-6 md:p-8">
+                <!-- Lời chúc -->
+                <div class="text-center mb-6">
+                    <div class="text-5xl mb-4">🎊</div>
+                    <h3 class="font-heading text-2xl font-bold text-tet-red mb-3">Chúc Mừng Năm Mới!</h3>
+                    <p class="text-gray-700 text-lg leading-relaxed">
+                        Chúc bạn một năm mới tràn đầy sức khỏe, hạnh phúc và thành công. 
+                        Mong rằng những điều tốt đẹp nhất sẽ đến với bạn và gia đình.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Phần cào lộc xuân -->
+                    <div class="">
+                        <div class="bg-white/80 rounded-lg p-4 mb-4">
+                            <p class="text-gray-600 text-sm mb-2">Cào để nhận lộc xuân</p>
+                            <div id="scratch-area" class="bg-gradient-to-r from-gray-200 to-gray-300 h-16 rounded-lg relative cursor-pointer flex items-center justify-center">
+                                <div class="absolute inset-0 bg-gradient-to-r from-tet-gold to-tet-gold-dark rounded-lg" id="scratch-overlay"></div>
+                                <span class="relative text-tet-red font-bold text-xl">CÀO ĐỂ XEM LỘC XUÂN</span>
+                            </div>
+                        </div>
+                        <div id="lucky-amount" class="hidden text-3xl font-bold text-tet-red animate-pulse">
+                            🎉 1.000.000 VND 🎉
+                        </div>
+                    </div>
+                    
+                    <!-- Người gửi -->
+                    <div class="text-center border-2 border-tet-gold/30 rounded-xl p-6 bg-gradient-to-br from-red-50 to-amber-50">
+                        <div class="text-4xl mb-3">💌</div>
+                        <p class="text-gray-600 mb-2">Với tất cả tấm lòng thành,</p>
+                        <p class="font-dancing text-3xl font-bold text-tet-red mb-1">Đàm Đình Đào</p>
+                        <p class="text-gray-500 italic mb-4">Chúc mừng năm mới Ất Tỵ 2025</p>
+                        <div class="text-sm text-gray-600 border-t pt-3">
+                            <p>"Mong một năm an khang</p>
+                            <p>Vạn sự như ý, tài lộc đầy nhà"</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Nút đóng -->
+                <div class="text-center mt-8">
+                    <button id="close-modal" class="bg-tet-red text-tet-cream font-semibold px-8 py-3 rounded-full hover:bg-tet-red-light transition-all duration-300">
+                        Trân Trọng Cảm Ơn
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const defaultConfig = {
+            tagline: "Gửi trao yêu thương – Nhận lộc an khang",
+            main_heading: "Người trao đang gửi lộc xuân cho..?",
+            footer_text: "Lộc Xuân 2026",
+            background_color: "#1a0a0a",
+            card_color: "#8B0000",
+            text_color: "#FFF8DC",
+            gold_color: "#FFD700",
+            accent_color: "#B22222",
+        };
+
+        let selectedRecipient = null;
+        let isModalOpen = false; // THÊM DÒNG NÀY
+
+        // Card selection logic
+        document.querySelectorAll(".card-envelope").forEach((card) => {
+            card.addEventListener("click", function () {
+                // Remove selection from all cards
+                document.querySelectorAll(".card-envelope").forEach((c) => {
+                    c.classList.remove("selected-card");
+                });
+
+                // Add selection to clicked card
+                this.classList.add("selected-card");
+                selectedRecipient = this.dataset.recipient;
+
+                // Show selection display
+                const selectionDisplay = document.getElementById("selection-display");
+                const selectedName = document.getElementById("selected-name");
+                const continueBtn = document.getElementById("continue-btn");
+
+                const recipientNames = {
+                    "ong-ba": "Ông Bà",
+                    "bo-me": "Bố Mẹ",
+                    "anh-chi-em": "Anh Chị Em",
+                    "con-cai": "Con Cái",
+                    "ban-be": "Bạn Bè",
+                    "dong-nghiep": "Đồng Nghiệp",
+                    "thay-co": "Thầy Cô",
+                    "nguoi-thuong": "Người Thương",
+                };
+
+                selectedName.textContent = recipientNames[selectedRecipient];
+                selectionDisplay.classList.remove("hidden");
+                continueBtn.classList.remove("hidden");
+            });
+        });
+
+        // Continue button click - Show 24 envelopes
+        document
+            .getElementById("continue-btn")
+            .addEventListener("click", function () {
+                const envelopesGrid = document.getElementById("envelopes-grid");
+                envelopesGrid.innerHTML = "";
+
+                if (selectedRecipient) {
+                    // Hide main content
+                    document.querySelector(".grid.grid-cols-2").classList.add("hidden");
+                    document
+                        .getElementById("selection-display")
+                        .classList.add("hidden");
+                    this.classList.add("hidden");
+
+                    // Show envelopes container
+                    const envelopesContainer = document.getElementById(
+                        "envelopes-container",
+                    );
+                    envelopesContainer.classList.remove("hidden");
+
+                    // Generate 24 envelopes
+                    const envelopesGrid = document.getElementById("envelopes-grid");
+                    envelopesGrid.innerHTML = "";
+
+                    // Hiển thị 24 bao lì xì mới
+                    for (let i = 1; i <= 24; i++) {
+                        envelopesGrid.appendChild(createEnvelope(i));
+                    }
+                }
+            });
+
+        // Back button - Return to main selection
+        document
+            .getElementById("back-btn")
+            .addEventListener("click", function () {
+                // Hide envelopes container
+                document
+                    .getElementById("envelopes-container")
+                    .classList.add("hidden");
+
+                // Show main content
+                document
+                    .querySelector(".grid.grid-cols-2")
+                    .classList.remove("hidden");
+                document
+                    .getElementById("selection-display")
+                    .classList.remove("hidden");
+                document.getElementById("continue-btn").classList.remove("hidden");
+            });
+
+        // =========== PHẦN TẠO BAO LÌ XÌ MỚI ===========
+        const luckyMessages = [
+            "Phát Tài Phát Lộc",
+            "Vạn Sự Như Ý",
+            "An Khang Thịnh Vượng",
+            "Tài Lộc Dồi Dào",
+            "Sức Khỏe Dồi Dào",
+            "Hạnh Phúc Viên Mãn",
+            "Công Thành Danh Toại",
+            "Mã Đáo Thành Công",
+            "Kim Ngọc Mãn Đường",
+            "Phúc Lộc Song Toàn",
+            "Thuận Buồm Xuôi Gió",
+            "Bình An Hạnh Phúc",
+        ];
+
+        const luckySymbols = ["福", "禄", "寿", "喜", "財", "吉", "祥", "發"];
+
+        // Biến global để quản lý timeout cho tất cả envelopes
+        let globalClickTimeout = null;
+        let lastClickedEnvelope = null;
+
+        function createEnvelope(number) {
+            const envelope = document.createElement("div");
+            envelope.className = "envelope-item";
+
+            const luckyMessage = luckyMessages[(number - 1) % luckyMessages.length];
+            const luckySymbol = luckySymbols[(number - 1) % luckySymbols.length];
+
+            // Xác định loại lì xì dựa trên số thứ tự
+            const envelopeTypes = [
+                "", // Màu đỏ truyền thống
+                "envelope-blue", // Xanh dương
+                "envelope-gold-light", // Xanh lá
+                "envelope-purple", // Tím
+                "envelope-gold", // Vàng đậm
+                "",
+                // từng row
+                "envelope-blue",
+                "envelope-gold-light",
+                "envelope-purple",
+                "envelope-gold",
+                "",
+                "envelope-blue",
+                "envelope-gold-light",
+                "envelope-purple",
+                "envelope-gold",
+                "",
+                "envelope-blue",
+                "envelope-gold-light",
+                "envelope-purple",
+                "envelope-gold",
+                "",
+                "envelope-blue",
+                "envelope-gold-light",
+                "envelope-purple",
+            ];
+
+            const envelopeType = envelopeTypes[(number - 1) % envelopeTypes.length];
+
+            // Xác định loại seal
+            let sealClass = "gold-seal";
+            if (number % 3 === 0) {
+                sealClass = "gold-seal silver-seal";
+            } else if (number % 5 === 0) {
+                sealClass = "gold-seal bronze-seal";
+            }
+
+            envelope.innerHTML = `
+                <div class="envelope-body">
+                    <div class="pattern-overlay"></div>
+                    <div class="shimmer"></div>
+                    
+                    <!-- Corner Decorations -->
+                    <div class="corner-decor top-left"></div>
+                    <div class="corner-decor top-right"></div>
+                    <div class="corner-decor bottom-left"></div>
+                    <div class="corner-decor bottom-right"></div>
+                    
+                    <!-- Flower Decorations -->
+                    <div class="flower-decor flower-top-left">🌸</div>
+                    <div class="flower-decor flower-top-right">🌸</div>
+                    <div class="flower-decor flower-bottom-left">🌸</div>
+                    <div class="flower-decor flower-bottom-right">🌸</div>
+                    
+                    <!-- Ornamental Bands -->
+                    <div class="ornament-pattern ornament-top"></div>
+                    <div class="ornament-pattern ornament-bottom"></div>
+                    
+                    <!-- Wave Patterns -->
+                    <div class="wave-pattern wave-top"></div>
+                    <div class="wave-pattern wave-bottom"></div>
+                    
+                    <!-- Diamond Patterns -->
+                    <div class="diamond-pattern diamond-1"></div>
+                    <div class="diamond-pattern diamond-2"></div>
+                    <div class="diamond-pattern diamond-3"></div>
+                    <div class="diamond-pattern diamond-4"></div>
+                    
+                    <!-- Lantern Decorations -->
+                    <div class="lantern-decor lantern-left">🏮</div>
+                    <div class="lantern-decor lantern-right">🏮</div>
+                    
+                    <!-- Gold Dots -->
+                    <div class="gold-dots" style="top: 28%; left: 25%;"></div>
+                    <div class="gold-dots" style="top: 28%; right: 25%;"></div>
+                    <div class="gold-dots" style="top: 40%; left: 20%;"></div>
+                    <div class="gold-dots" style="top: 40%; right: 20%;"></div>
+                    <div class="gold-dots" style="bottom: 28%; left: 25%;"></div>
+                    <div class="gold-dots" style="bottom: 28%; right: 25%;"></div>
+                    <div class="gold-dots" style="bottom: 40%; left: 20%;"></div>
+                    <div class="gold-dots" style="bottom: 40%; right: 20%;"></div>
+                    
+                    <!-- Cloud Patterns -->
+                    <div class="cloud-pattern cloud-1"></div>
+                    <div class="cloud-pattern cloud-2"></div>
+                    
+                    <!-- Lucky Knot -->
+                    <div class="lucky-knot"></div>
+                    
+                    <!-- Top Flap -->
+                    <div class="envelope-flap"></div>
+                    
+                    <!-- Gold Seal -->
+                    <div class="${sealClass}">
+                        <span class="seal-text">${luckySymbol}</span>
+                    </div>
+                    
+                    <!-- Lucky Message -->
+                    <div class="lucky-message">${luckyMessage}</div>
+                    
+                    <!-- Number Badge -->
+                    <div class="envelope-number">Lì Xì #${number}</div>
+                </div>
+            `;
+
+            // Thêm lớp màu cho envelope
+            if (envelopeType) {
+                envelope.classList.add(envelopeType);
+            }
+
+
+
+            envelope.addEventListener("click", function () {
+                // Hủy timeout trước đó nếu có
+                if (globalClickTimeout) {
+                    clearTimeout(globalClickTimeout);
+                }
+                
+                // Xóa hiệu ứng clicked của envelope trước đó
+                if (lastClickedEnvelope && lastClickedEnvelope !== this) {
+                    lastClickedEnvelope.classList.remove("clicked");
+                }
+                
+                // Thêm hiệu ứng clicked cho envelope hiện tại
+                this.classList.add("clicked");
+                lastClickedEnvelope = this;
+                
+                // Lưu reference
+                const currentEnvelope = this;
+                const currentNumber = number;
+                
+                // Đặt timeout mới
+                globalClickTimeout = setTimeout(() => {
+                    currentEnvelope.classList.remove("clicked");
+                    
+                    // Chỉ hiện confirm cho lần click cuối cùng
+                    if (confirm("Bạn đã chắc chắn muốn nhận bao lì xì #" + currentNumber + " này chứ?")) {
+                        console.log("Đã chọn lì xì #" + currentNumber);
+                        
+                        // Mở modal Tâm Thư & Lộc Xuân
+                        openHeartLetterModal(currentNumber);
+                    }
+                    
+                    globalClickTimeout = null;
+                    lastClickedEnvelope = null;
+                }, 500);
+            });
+
+            return envelope;
+        }
+        // =========== END PHẦN TẠO BAO LÌ XÌ MỚI ===========
+
+        // Hàm mở modal Tâm Thư & Lộc Xuân
+        function openHeartLetterModal(envelopeNumber) {
+            const modal = document.getElementById('heart-letter-modal');
+            const scratchArea = document.getElementById('scratch-area');
+            const scratchOverlay = document.getElementById('scratch-overlay');
+            const luckyAmount = document.getElementById('lucky-amount');
+            
+            // Reset trạng thái
+            scratchOverlay.style.opacity = '1';
+            luckyAmount.classList.add('hidden');
+            
+            // Hiển thị modal
+            modal.classList.remove('hidden');
+            
+            // Xử lý cào (chỉ gán 1 lần)
+            scratchArea.onclick = function() {
+                scratchOverlay.style.opacity = '0';
+                scratchOverlay.style.transition = 'opacity 0.5s';
+                
+                // Random số tiền may mắn
+                const amounts = ['500.000 VND', '1.000.000 VND', '2.000.000 VND', '5.000.000 VND', '10.000.000 VND'];
+                const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
+                
+                luckyAmount.textContent = `🎉 ${randomAmount} 🎉`;
+                
+                // Hiển thị số tiền với animation
+                setTimeout(() => {
+                    luckyAmount.classList.remove('hidden');
+                }, 500);
+            };
+        }
+
+        // Xử lý đóng modal - ĐẶT NGOÀI HÀM openHeartLetterModal
+        document.getElementById('close-modal').addEventListener('click', function() {
+            document.getElementById('heart-letter-modal').classList.add('hidden');
+        });
+
+        // Đóng modal khi click overlay
+        document.getElementById('heart-letter-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+            }
+        });
+        // end Hàm mở modal Tâm Thư & Lộc Xuân
+
+        // Element SDK initialization
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig,
+                onConfigChange: async (config) => {
+                    document.getElementById("tagline").textContent =
+                        config.tagline || defaultConfig.tagline;
+                    document.getElementById("main-heading").textContent =
+                        config.main_heading || defaultConfig.main_heading;
+                    document.getElementById("footer-text").textContent =
+                        config.footer_text || defaultConfig.footer_text;
+                },
+                mapToCapabilities: (config) => ({
+                    recolorables: [
+                        {
+                            get: () =>
+                                config.background_color || defaultConfig.background_color,
+                            set: (value) => {
+                                config.background_color = value;
+                                window.elementSdk.setConfig({ background_color: value });
+                            },
+                        },
+                        {
+                            get: () => config.card_color || defaultConfig.card_color,
+                            set: (value) => {
+                                config.card_color = value;
+                                window.elementSdk.setConfig({ card_color: value });
+                            },
+                        },
+                        {
+                            get: () => config.text_color || defaultConfig.text_color,
+                            set: (value) => {
+                                config.text_color = value;
+                                window.elementSdk.setConfig({ text_color: value });
+                            },
+                        },
+                        {
+                            get: () => config.gold_color || defaultConfig.gold_color,
+                            set: (value) => {
+                                config.gold_color = value;
+                                window.elementSdk.setConfig({ gold_color: value });
+                            },
+                        },
+                        {
+                            get: () => config.accent_color || defaultConfig.accent_color,
+                            set: (value) => {
+                                config.accent_color = value;
+                                window.elementSdk.setConfig({ accent_color: value });
+                            },
+                        },
+                    ],
+                    borderables: [],
+                    fontEditable: undefined,
+                    fontSizeable: undefined,
+                }),
+                mapToEditPanelValues: (config) =>
+                    new Map([
+                        ["tagline", config.tagline || defaultConfig.tagline],
+                        [
+                            "main_heading",
+                            config.main_heading || defaultConfig.main_heading,
+                        ],
+                        ["footer_text", config.footer_text || defaultConfig.footer_text],
+                    ]),
+            });
+        }
+    </script>
+    <script>
+        (function () {
+            function c() {
+                var b = a.contentDocument || a.contentWindow.document;
+                if (b) {
+                    var d = b.createElement("script");
+                    d.innerHTML =
+                        "window.__CF$cv$params={r:'9c2ca0b8301704f6',t:'MTc2OTIyNzI2OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+                    b.getElementsByTagName("head")[0].appendChild(d);
+                }
+            }
+            if (document.body) {
+                var a = document.createElement("iframe");
+                a.height = 1;
+                a.width = 1;
+                a.style.position = "absolute";
+                a.style.top = 0;
+                a.style.left = 0;
+                a.style.border = "none";
+                a.style.visibility = "hidden";
+                document.body.appendChild(a);
+                if ("loading" !== document.readyState) c();
+                else if (window.addEventListener)
+                    document.addEventListener("DOMContentLoaded", c);
+                else {
+                    var e = document.onreadystatechange || function () { };
+                    document.onreadystatechange = function (b) {
+                        e(b);
+                        "loading" !== document.readyState &&
+                            ((document.onreadystatechange = e), c());
+                    };
+                }
+            }
+        })();
+    </script>
+</body>
+
+</html>
