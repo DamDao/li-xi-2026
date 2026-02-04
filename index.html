@@ -361,6 +361,10 @@
             accent_color: "#B22222",
         };
 
+        // ===== DEBUG MODE =====
+        const DEBUG_MODE = true; // Đổi thành false khi deploy production
+        // ======================
+
         let selectedRecipient = null;
         let isModalOpen = false; // THÊM DÒNG NÀY
 
@@ -616,12 +620,12 @@
                     currentEnvelope.classList.remove("clicked");
                     
                     // Chỉ hiện confirm cho lần click cuối cùng
-                    if (confirm("Bạn đã chắc chắn muốn nhận bao lì xì #" + currentNumber + " này chứ?")) {
+                    // if (confirm("Bạn đã chắc chắn muốn nhận bao lì xì #" + currentNumber + " này chứ?")) {
                         console.log("Đã chọn lì xì #" + currentNumber);
                         
                         // Mở modal Tâm Thư & Lộc Xuân
                         openHeartLetterModal(currentNumber);
-                    }
+                    // }
                     
                     globalClickTimeout = null;
                     lastClickedEnvelope = null;
@@ -647,21 +651,21 @@
             modal.classList.remove('hidden');
             
             // Xử lý cào (chỉ gán 1 lần)
-            scratchArea.onclick = function() {
-                scratchOverlay.style.opacity = '0';
-                scratchOverlay.style.transition = 'opacity 0.5s';
+            // scratchArea.onclick = function() {
+            //     scratchOverlay.style.opacity = '0';
+            //     scratchOverlay.style.transition = 'opacity 0.5s';
                 
-                // Random số tiền may mắn
-                const amounts = ['500.000 VND', '1.000.000 VND', '2.000.000 VND', '5.000.000 VND', '10.000.000 VND'];
-                const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
+            //     // Random số tiền may mắn
+            //     const amounts = ['500.000 VND', '1.000.000 VND', '2.000.000 VND', '5.000.000 VND', '10.000.000 VND'];
+            //     const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
                 
-                luckyAmount.textContent = `🎉 ${randomAmount} 🎉`;
+            //     luckyAmount.textContent = `🎉 ${randomAmount} 🎉`;
                 
-                // Hiển thị số tiền với animation
-                setTimeout(() => {
-                    luckyAmount.classList.remove('hidden');
-                }, 500);
-            };
+            //     // Hiển thị số tiền với animation
+            //     setTimeout(() => {
+            //         luckyAmount.classList.remove('hidden');
+            //     }, 500);
+            // };
         }
 
         // Xử lý đóng modal - ĐẶT NGOÀI HÀM openHeartLetterModal
@@ -676,6 +680,33 @@
             }
         });
         // end Hàm mở modal Tâm Thư & Lộc Xuân
+
+        // =========== AUTO SHOW 24 ENVELOPES FOR TESTING ===========
+        if (DEBUG_MODE) {
+            window.addEventListener('DOMContentLoaded', function() {
+                // Ẩn phần chọn người nhận
+                document.querySelector(".grid.grid-cols-2").classList.add("hidden");
+                document.getElementById("selection-display").classList.add("hidden");
+                document.getElementById("continue-btn").classList.add("hidden");
+                
+                // Hiển thị container 24 bao lì xì
+                const envelopesContainer = document.getElementById("envelopes-container");
+                envelopesContainer.classList.remove("hidden");
+                
+                // Tạo 24 bao lì xì
+                const envelopesGrid = document.getElementById("envelopes-grid");
+                envelopesGrid.innerHTML = "";
+                
+                for (let i = 1; i <= 24; i++) {
+                    envelopesGrid.appendChild(createEnvelope(i));
+                }
+                
+                // Set selectedRecipient để nút Back vẫn hoạt động
+                selectedRecipient = "test-mode";
+            });
+        }
+        // =========== END AUTO SHOW ===========
+
 
         // Element SDK initialization
         if (window.elementSdk) {
