@@ -791,16 +791,14 @@ body {
 
 /* <!-- End CSS phần grid layout danh sách bao lì xì --> */
 
-
-
 /* MOdal tâm thư lộc xuân CSS phần font Dancing Script */
 .font-dancing {
-    font-family: 'Dancing Script', cursive;
+    font-family: "Dancing Script", cursive;
 }
 
 /* CSS phần modal */
 #heart-letter-modal {
-    font-family: 'Be Vietnam Pro', sans-serif;
+    font-family: "Be Vietnam Pro", sans-serif;
 }
 
 #scratch-overlay {
@@ -818,6 +816,7 @@ body {
         transform: scale(0.5);
         opacity: 0;
     }
+
     100% {
         transform: scale(1);
         opacity: 1;
@@ -831,3 +830,9 @@ body {
 .lock-ui .envelope-item {
     pointer-events: none;
 }
+
+/* <!-- ===== THIỆP BÊN NGOÀI (COVER) ===== --> */
+/* ===== COVER CARD ===== */
+/* <!-- ===== END COVER ===== --> */
+
+/* ===== HIỆU ỨNG MỞ THIỆP 3D ===== */

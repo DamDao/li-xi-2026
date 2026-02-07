@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <style>
+        body {
+            margin: 0;
+            background: #f8f9fa;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #launchBtn {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 64px;
+            height: 64px;
+            background: white;
+            border: 1px solid #dadce0;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 24px;
+        }
+
+        #launchBtn:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            transform: translateX(-50%) scale(1.1);
+            background-color: #f8f9fa;
+        }
+
+        #launchBtn:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+    </style>
+</head>
+
+<body>
+    <button id="launchBtn" title="Bắn pháo hoa">🎆</button>
+    <canvas id="fireworksCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("fireworksCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const colors = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
+        let particles = [];
+        let currentRockets = 0;
+        const MAX_ROCKETS = 15;
+
+        class Particle {
+            constructor(x, y, color, isRocket = false, targetY = 0) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.isRocket = isRocket;
+                this.targetY = targetY;
+                this.alpha = 1;
+
+                if (this.isRocket) {
+                    this.velocity = {
+                        x: (Math.random() - 0.5) * 10,
+                        y: -10 - Math.random() * 4,
+                    };
+                    this.friction = 1;
+                    this.gravity = 0.1;
+                } else {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 8 + 2;
+                    this.velocity = {
+                        x: Math.cos(angle) * speed,
+                        y: Math.sin(angle) * speed,
+                    };
+                    this.friction = 0.95;
+                    this.gravity = 0.15;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = this.isRocket ? 3 : 2;
+                ctx.lineCap = "round";
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(
+                    this.x - this.velocity.x * 2,
+                    this.y - this.velocity.y * 2,
+                );
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            update() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+
+                if (this.isRocket) {
+                    if (this.y <= this.targetY || this.velocity.y >= 0) {
+                        this.alpha = 0;
+                        explode(this.x, this.y, this.color);
+                    }
+                } else {
+                    this.alpha -= 0.015;
+                }
+            }
+        }
+
+        function explode(x, y, color) {
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        // CHỈ GIỮ LẠI MỘT HÀM LAUNCH DUY NHẤT
+        function launch() {
+            if (currentRockets >= MAX_ROCKETS) return;
+
+            currentRockets++;
+            
+            const launchPoints = [canvas.width * 0.2, canvas.width * 0.5, canvas.width * 0.8];
+            const baseLineX = launchPoints[Math.floor(Math.random() * launchPoints.length)];
+            const x = baseLineX + (Math.random() - 0.5) * 50; 
+            const targetY = Math.random() * (canvas.height * 0.4);
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            const rocket = new Particle(x, canvas.height, color, true, targetY);
+            
+            // Xử lý giảm biến đếm khi pháo nổ
+            const originalUpdate = rocket.update;
+            rocket.update = function() {
+                const wasAlive = this.alpha > 0;
+                originalUpdate.call(this);
+                if (wasAlive && this.alpha <= 0) {
+                    currentRockets--;
+                }
+            };
+
+            particles.push(rocket);
+        }
+
+        function animate() {
+            // Nếu vẫn còn hạt pháo, vẽ lớp phủ mờ để tạo vệt đuôi
+            if (particles.length > 0) {
+                ctx.fillStyle = "rgba(248, 249, 250, 0.15)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.update();
+                    p.draw();
+                    if (p.alpha <= 0) {
+                        particles.splice(i, 1);
+                    }
+                }
+            } else {
+                // Nếu không còn hạt nào, xóa sạch Canvas về màu nền gốc để mất hẳn vết mờ
+                ctx.fillStyle = "#f8f9fa";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        document.getElementById("launchBtn").addEventListener("click", () => {
+            let cumulativeDelay = 0;
+            for (let i = 0; i < 50; i++) {
+                let currentDelay = (i < 5) ? 250 : (i < 12) ? 150 : 50;
+                cumulativeDelay += currentDelay;
+                setTimeout(launch, cumulativeDelay);
+            }
+        });
+
+        animate();
+    </script>
+</body>
+
+</html>

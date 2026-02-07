@@ -19,6 +19,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link href="src/css/style.css" rel="stylesheet" />
+    <link href="src/css/phao-hoa.css" rel="stylesheet" />
 
     <script>
         tailwind.config = {
@@ -68,6 +69,109 @@
                 transform: scale(1);
                 opacity: 1;
             }
+        }
+
+        /* CSS cho COVER MỚI */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.8), 0 0 60px rgba(255, 215, 0, 0.4); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes lantern-sway {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .outer-card-shadow {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 215, 0, 0.3);
+        }
+
+        .inner-card-frame {
+            border: 2px solid;
+            border-image: linear-gradient(135deg, #ffd700, #b8860b, #ffd700, #daa520, #ffd700) 1;
+            background: linear-gradient(180deg, rgba(139, 0, 0, 0.95) 0%, rgba(80, 0, 0, 0.98) 100%);
+        }
+
+        .text-shadow-gold {
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .text-shadow-dark {
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .float-animation { animation: float 4s ease-in-out infinite; }
+        .sparkle { animation: sparkle 2s ease-in-out infinite; }
+        .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+        .shimmer-text {
+            background: linear-gradient(90deg, #ffd700, #fff8dc, #ffd700, #fff8dc, #ffd700);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+
+        .lantern {
+            animation: lantern-sway 3s ease-in-out infinite;
+            transform-origin: top center;
+        }
+
+        /* .lantern-delay-1 { animation-delay: 0.3s; } */
+
+        .decorative-corner {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            opacity: 0.8;
+        }
+
+        .corner-tl { top: 10px; left: 10px; }
+        .corner-tr { top: 10px; right: 10px; transform: scaleX(-1); }
+        .corner-bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
+        .corner-br { bottom: 10px; right: 10px; transform: scale(-1, -1); }
+
+        .img-fallback {
+            background: linear-gradient(135deg, #8B0000, #FFD700);
+        }
+    </style>
+
+    <style>
+        /* Canvas cào lì xì */
+        #scratch-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+            border-radius: 0.5rem;
+        }
+
+        #scratch-canvas:active {
+            cursor: grabbing;
+        }
+
+        #scratch-area {
+            position: relative;
+            user-select: none;
+            -webkit-user-select: none;
         }
     </style>
     <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
@@ -274,6 +378,10 @@
 
             <!-- Footer -->
             <footer class="text-center">
+
+                <button id="launchBtn" title="Bắn pháo hoa">🎆</button>
+                <canvas id="fireworksCanvas"></canvas>
+
                 <p id="footer-text" class="font-heading text-tet-gold text-xl md:text-2xl mb-2">
                     Lộc Xuân 2026
                 </p>
@@ -292,7 +400,85 @@
     <!-- Modal Tâm Thư & Lộc Xuân -->
     <div id="heart-letter-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/70"></div>
-        <div class="relative bg-gradient-to-br from-red-50 to-amber-50 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border-4 border-tet-gold">
+        <div class="relative bg-gradient-to-br from-red-50 to-amber-50 w-full max-w-4xl rounded-xl shadow-xl overflow-hidden border-2 border-tet-gold">
+            
+            <!-- ===== THIỆP BÊN NGOÀI (COVER) MỚI ===== -->
+            <div id="card-cover" class="absolute inset-0 z-20 flex items-center justify-center" style="background: radial-gradient(ellipse at top, #8b0000 0%, #5c0000 50%, #3d0000 100%);">
+                <div class="relative z-10 max-w-4xl w-full">
+                    <div class="relative bg-gradient-to-b from-red-900/90 to-red-950/95 rounded-3xl p-1 shadow-2xl outer-card-shadow">
+                        <div class="relative rounded-2xl p-6 md:p-8 inner-card-frame">
+                            <svg class="decorative-corner corner-tl" viewbox="0 0 80 80">
+                                <path d="M5 40 Q5 5 40 5" fill="none" stroke="#FFD700" stroke-width="2" />
+                                <path d="M10 35 Q10 10 35 10" fill="none" stroke="#FFD700" stroke-width="1.5" opacity="0.7" />
+                                <circle cx="8" cy="8" r="3" fill="#FFD700" />
+                                <path d="M15 5 L15 25 M5 15 L25 15" stroke="#FFD700" stroke-width="1" opacity="0.5" />
+                            </svg>
+                            <svg class="decorative-corner corner-tr" viewbox="0 0 80 80">
+                                <path d="M5 40 Q5 5 40 5" fill="none" stroke="#FFD700" stroke-width="2" />
+                                <path d="M10 35 Q10 10 35 10" fill="none" stroke="#FFD700" stroke-width="1.5" opacity="0.7" />
+                                <circle cx="8" cy="8" r="3" fill="#FFD700" />
+                                <path d="M15 5 L15 25 M5 15 L25 15" stroke="#FFD700" stroke-width="1" opacity="0.5" />
+                            </svg>
+                            <svg class="decorative-corner corner-bl" viewbox="0 0 80 80">
+                                <path d="M5 40 Q5 5 40 5" fill="none" stroke="#FFD700" stroke-width="2" />
+                                <path d="M10 35 Q10 10 35 10" fill="none" stroke="#FFD700" stroke-width="1.5" opacity="0.7" />
+                                <circle cx="8" cy="8" r="3" fill="#FFD700" />
+                                <path d="M15 5 L15 25 M5 15 L25 15" stroke="#FFD700" stroke-width="1" opacity="0.5" />
+                            </svg>
+                            <svg class="decorative-corner corner-br" viewbox="0 0 80 80">
+                                <path d="M5 40 Q5 5 40 5" fill="none" stroke="#FFD700" stroke-width="2" />
+                                <path d="M10 35 Q10 10 35 10" fill="none" stroke="#FFD700" stroke-width="1.5" opacity="0.7" />
+                                <circle cx="8" cy="8" r="3" fill="#FFD700" />
+                                <path d="M15 5 L15 25 M5 15 L25 15" stroke="#FFD700" stroke-width="1" opacity="0.5" />
+                            </svg>
+
+                            <div class="text-center relative z-10 py-4">
+
+                                <div class="inline-block mb-4">
+                                    <div class="relative">
+                                        <div class="absolute inset-0 bg-gradient-to-r from-yellow-600 to-yellow-400 blur-lg opacity-50 rounded-full"></div>
+                                        <div class="relative bg-gradient-to-br from-yellow-500 via-yellow-400 to-yellow-600 text-red-900 font-bold text-lg px-6 py-2 rounded-full shadow-lg text-shadow-gold">
+                                            🐴 NĂM BÍNH NGỌ 2026 🐴
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h1 id="main-title" class="font-heading text-3xl md:text-4xl font-bold mb-3 shimmer-text leading-tight">
+                                    CHÚC MỪNG NĂM MỚI
+                                </h1>
+
+                                <div class="flex items-center justify-center gap-3 my-4">
+                                    <div class="h-px w-16 bg-gradient-to-r from-transparent to-yellow-500"></div>
+                                    <span class="text-yellow-400 text-2xl">❧</span>
+                                    <div class="h-px w-16 bg-gradient-to-l from-transparent to-yellow-500"></div>
+                                </div>
+
+                                <p id="subtitle" class="font-dancing text-2xl md:text-3xl text-yellow-200 mb-6 text-shadow-dark">
+                                    An Khang Thịnh Vượng
+                                </p>
+
+                                <p class="text-yellow-100/90 text-sm md:text-base mb-6 px-4 leading-relaxed">
+                                    Kính chúc quý vị một năm mới<br />
+                                    <span class="text-yellow-300 font-semibold">Vạn Sự Như Ý • Tài Lộc Đầy Nhà</span>
+                                </p>
+
+                                <button id="open-card-btn" class="relative group pulse-glow rounded-full overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <div class="relative bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-500 text-red-900 font-bold px-10 py-2 rounded-full transition-all duration-300 group-hover:scale-105 text-shadow-gold">
+                                        <span class="flex items-center gap-2">
+                                            <span>✉️</span> <span>MỞ THIỆP</span> <span>✉️</span>
+                                        </span>
+                                    </div>
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ===== END COVER MỚI ===== -->
+
+            <!-- Nội dung tâm thư -->
             <!-- Header -->
             <div class="bg-gradient-to-r from-tet-red to-tet-red-light py-4 px-6 text-center">
                 <h2 class="font-heading text-3xl font-bold text-tet-gold">TÂM THƯ & LỘC XUÂN</h2>
@@ -302,8 +488,7 @@
             <!-- Content -->
             <div class="p-6 md:p-8">
                 <!-- Lời chúc -->
-                <div class="text-center mb-6">
-                    <div class="text-5xl mb-4">🎊</div>
+                <div class="text-center mb-3  border-b-2 pb-6  border-tet-gold/30">
                     <h3 class="font-heading text-2xl font-bold text-tet-red mb-3">Chúc Mừng Năm Mới!</h3>
                     <p class="text-gray-700 text-lg leading-relaxed">
                         Chúc bạn một năm mới tràn đầy sức khỏe, hạnh phúc và thành công. 
@@ -314,33 +499,28 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Phần cào lộc xuân -->
                     <div class="">
-                        <div class="bg-white/80 rounded-lg p-4 mb-4">
-                            <p class="text-gray-600 text-sm mb-2">Cào để nhận lộc xuân</p>
-                            <div id="scratch-area" class="bg-gradient-to-r from-gray-200 to-gray-300 h-16 rounded-lg relative cursor-pointer flex items-center justify-center">
-                                <div class="absolute inset-0 bg-gradient-to-r from-tet-gold to-tet-gold-dark rounded-lg" id="scratch-overlay"></div>
-                                <span class="relative text-tet-red font-bold text-xl">CÀO ĐỂ XEM LỘC XUÂN</span>
+                        <div class="rounded-lg p-2">
+                        <p class="text-sm text-gray-600 italic mb-1">Chúc mừng năm mới Ất Tỵ 2025</p>
+                        <div id="scratch-area" class="bg-gradient-to-r from-gray-200 to-gray-300 h-16 rounded-lg relative overflow-hidden flex items-center justify-center">
+                            <!-- Nội dung bên dưới - số tiền -->
+                            <div id="lucky-amount" class="absolute inset-0 flex items-center justify-center text-xl md:text-2xl font-bold text-tet-red">
+                                <span id="money-display"></span>
                             </div>
+                            <!-- Canvas cào -->
+                            <canvas id="scratch-canvas"></canvas>
                         </div>
-                        <div id="lucky-amount" class="hidden text-3xl font-bold text-tet-red animate-pulse">
-                            🎉 1.000.000 VND 🎉
-                        </div>
+                    </div>
                     </div>
                     
                     <!-- Người gửi -->
-                    <div class="text-center border-2 border-tet-gold/30 rounded-xl p-6 bg-gradient-to-br from-red-50 to-amber-50">
-                        <div class="text-4xl mb-3">💌</div>
-                        <p class="text-gray-600 mb-2">Với tất cả tấm lòng thành,</p>
+                    <div class="text-end">
+                        <p class="text-sm text-gray-600 italic mb-1">Người gửi</p>
                         <p class="font-dancing text-3xl font-bold text-tet-red mb-1">Đàm Đình Đào</p>
-                        <p class="text-gray-500 italic mb-4">Chúc mừng năm mới Ất Tỵ 2025</p>
-                        <div class="text-sm text-gray-600 border-t pt-3">
-                            <p>"Mong một năm an khang</p>
-                            <p>Vạn sự như ý, tài lộc đầy nhà"</p>
-                        </div>
                     </div>
                 </div>
                 
                 <!-- Nút đóng -->
-                <div class="text-center mt-8">
+                <div class="text-center mt-5">
                     <button id="close-modal" class="bg-tet-red text-tet-cream font-semibold px-8 py-3 rounded-full hover:bg-tet-red-light transition-all duration-300">
                         Trân Trọng Cảm Ơn
                     </button>
@@ -366,7 +546,7 @@
         // ======================
 
         let selectedRecipient = null;
-        let isModalOpen = false; // THÊM DÒNG NÀY
+        let isModalOpen = false; 
 
         // Card selection logic
         document.querySelectorAll(".card-envelope").forEach((card) => {
@@ -638,40 +818,151 @@
 
         // Hàm mở modal Tâm Thư & Lộc Xuân
         function openHeartLetterModal(envelopeNumber) {
+
+            const cover = document.getElementById('card-cover');
+            cover.style.display = 'flex';
+            cover.style.opacity = '1';
+
             const modal = document.getElementById('heart-letter-modal');
-            const scratchArea = document.getElementById('scratch-area');
-            const scratchOverlay = document.getElementById('scratch-overlay');
-            const luckyAmount = document.getElementById('lucky-amount');
-            
-            // Reset trạng thái
-            scratchOverlay.style.opacity = '1';
-            luckyAmount.classList.add('hidden');
             
             // Hiển thị modal
             modal.classList.remove('hidden');
             
-            // Xử lý cào (chỉ gán 1 lần)
-            // scratchArea.onclick = function() {
-            //     scratchOverlay.style.opacity = '0';
-            //     scratchOverlay.style.transition = 'opacity 0.5s';
+            // Khởi tạo canvas cào lì xì
+            initScratchCard();
+        }
+
+        // Hàm khởi tạo canvas cào lì xì
+        function initScratchCard() {
+            const canvas = document.getElementById('scratch-canvas');
+            const ctx = canvas.getContext('2d');
+            const scratchArea = document.getElementById('scratch-area');
+            const moneyDisplay = document.getElementById('money-display');
+            
+            // Random mệnh giá
+            const amounts = ['10.000', '20.000', '30.000', '40.000', '50.000', '100.000'];
+            const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
+            moneyDisplay.textContent = `🎉 ${randomAmount} VND 🎉`;
+            
+            // Thiết lập kích thước canvas
+            canvas.width = scratchArea.offsetWidth;
+            canvas.height = scratchArea.offsetHeight;
+            
+            // Vẽ lớp phủ vàng
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            gradient.addColorStop(0, '#DAA520');
+            gradient.addColorStop(0.5, '#FFD700');
+            gradient.addColorStop(1, '#DAA520');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Thêm text "CÀO ĐỂ XEM LỘC XUÂN"
+            ctx.fillStyle = '#8B0000';
+            ctx.font = 'bold 14px "Be Vietnam Pro", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('CÀO ĐỂ XEM LỘC XUÂN', canvas.width / 2, canvas.height / 2);
+            
+            let isScratching = false;
+            let lastX = 0;
+            let lastY = 0;
+            
+            // Hàm cào
+            function scratch(x, y) {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.fill();
                 
-            //     // Random số tiền may mắn
-            //     const amounts = ['500.000 VND', '1.000.000 VND', '2.000.000 VND', '5.000.000 VND', '10.000.000 VND'];
-            //     const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
+                // Vẽ đường nối giữa các điểm
+                if (lastX && lastY) {
+                    ctx.beginPath();
+                    ctx.moveTo(lastX, lastY);
+                    ctx.lineTo(x, y);
+                    ctx.lineWidth = 40;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                }
                 
-            //     luckyAmount.textContent = `🎉 ${randomAmount} 🎉`;
-                
-            //     // Hiển thị số tiền với animation
-            //     setTimeout(() => {
-            //         luckyAmount.classList.remove('hidden');
-            //     }, 500);
-            // };
+                lastX = x;
+                lastY = y;
+
+            }
+        
+            // Lấy vị trí chuột/touch
+            function getPosition(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                return { x, y };
+            }
+            
+            // Sự kiện chuột
+            canvas.addEventListener('mousedown', (e) => {
+                isScratching = true;
+                const pos = getPosition(e);
+                scratch(pos.x, pos.y);
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                if (isScratching) {
+                    const pos = getPosition(e);
+                    scratch(pos.x, pos.y);
+                }
+            });
+            
+            canvas.addEventListener('mouseup', () => {
+                isScratching = false;
+                lastX = 0;
+                lastY = 0;
+            });
+            
+            canvas.addEventListener('mouseleave', () => {
+                isScratching = false;
+                lastX = 0;
+                lastY = 0;
+            });
+            
+            // Sự kiện touch (mobile)
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                isScratching = true;
+                const pos = getPosition(e);
+                scratch(pos.x, pos.y);
+            });
+            
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (isScratching) {
+                    const pos = getPosition(e);
+                    scratch(pos.x, pos.y);
+                }
+            });
+            
+            canvas.addEventListener('touchend', () => {
+                isScratching = false;
+                lastX = 0;
+                lastY = 0;
+            });
         }
 
         // Xử lý đóng modal - ĐẶT NGOÀI HÀM openHeartLetterModal
         document.getElementById('close-modal').addEventListener('click', function() {
             document.getElementById('heart-letter-modal').classList.add('hidden');
         });
+
+        // ===== MỞ THIỆP → ẨN COVER =====
+        document.getElementById('open-card-btn').addEventListener('click', function () {
+            const cover = document.getElementById('card-cover');
+
+            cover.style.opacity = '0';
+            cover.style.transition = 'opacity 0.6s ease';
+
+            setTimeout(() => {
+                cover.style.display = 'none';
+            }, 600);
+        });
+
 
         // Đóng modal khi click overlay
         document.getElementById('heart-letter-modal').addEventListener('click', function(e) {
@@ -775,40 +1066,151 @@
             });
         }
     </script>
+
+    <!-- Pháo hoa -->
     <script>
-        (function () {
-            function c() {
-                var b = a.contentDocument || a.contentWindow.document;
-                if (b) {
-                    var d = b.createElement("script");
-                    d.innerHTML =
-                        "window.__CF$cv$params={r:'9c2ca0b8301704f6',t:'MTc2OTIyNzI2OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
-                    b.getElementsByTagName("head")[0].appendChild(d);
-                }
-            }
-            if (document.body) {
-                var a = document.createElement("iframe");
-                a.height = 1;
-                a.width = 1;
-                a.style.position = "absolute";
-                a.style.top = 0;
-                a.style.left = 0;
-                a.style.border = "none";
-                a.style.visibility = "hidden";
-                document.body.appendChild(a);
-                if ("loading" !== document.readyState) c();
-                else if (window.addEventListener)
-                    document.addEventListener("DOMContentLoaded", c);
-                else {
-                    var e = document.onreadystatechange || function () { };
-                    document.onreadystatechange = function (b) {
-                        e(b);
-                        "loading" !== document.readyState &&
-                            ((document.onreadystatechange = e), c());
+        const canvas = document.getElementById("fireworksCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const colors = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
+        let particles = [];
+        let currentRockets = 0;
+        const MAX_ROCKETS = 10;
+
+        class Particle {
+            constructor(x, y, color, isRocket = false, targetY = 0) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.isRocket = isRocket;
+                this.targetY = targetY;
+                this.alpha = 1;
+
+                if (this.isRocket) {
+                    this.velocity = {
+                        x: (Math.random() - 0.5) * 10,
+                        y: -10 - Math.random() * 4,
                     };
+                    this.friction = 1;
+                    this.gravity = 0.1;
+                } else {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 8 + 2;
+                    this.velocity = {
+                        x: Math.cos(angle) * speed,
+                        y: Math.sin(angle) * speed,
+                    };
+                    this.friction = 0.95;
+                    this.gravity = 0.15;
                 }
             }
-        })();
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = this.isRocket ? 3 : 2;
+                ctx.lineCap = "round";
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(
+                    this.x - this.velocity.x * 2,
+                    this.y - this.velocity.y * 2,
+                );
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            update() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+
+                if (this.isRocket) {
+                    if (this.y <= this.targetY || this.velocity.y >= 0) {
+                        this.alpha = 0;
+                        explode(this.x, this.y, this.color);
+                    }
+                } else {
+                    this.alpha -= 0.015;
+                }
+            }
+        }
+
+        function explode(x, y, color) {
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        // CHỈ GIỮ LẠI MỘT HÀM LAUNCH DUY NHẤT
+        function launch() {
+            if (currentRockets >= MAX_ROCKETS) return;
+
+            currentRockets++;
+            
+            const launchPoints = [canvas.width * 0.2, canvas.width * 0.5, canvas.width * 0.8];
+            const baseLineX = launchPoints[Math.floor(Math.random() * launchPoints.length)];
+            const x = baseLineX + (Math.random() - 0.5) * 50; 
+            const targetY = Math.random() * (canvas.height * 0.4);
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            const rocket = new Particle(x, canvas.height, color, true, targetY);
+            
+            // Xử lý giảm biến đếm khi pháo nổ
+            const originalUpdate = rocket.update;
+            rocket.update = function() {
+                const wasAlive = this.alpha > 0;
+                originalUpdate.call(this);
+                if (wasAlive && this.alpha <= 0) {
+                    currentRockets--;
+                }
+            };
+
+            particles.push(rocket);
+        }
+
+        function animate() {
+            // 1. Thay vì dùng màu trắng đè lên, ta dùng chế độ 'destination-out'
+            // Nó sẽ làm mờ dần các hạt cũ trực tiếp vào sự TRONG SUỐT
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = "rgba(0, 0, 0, 0.15)"; // Con số 0.15 giữ nguyên độ dài đuôi
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 2. Trả về chế độ vẽ bình thường để vẽ hạt mới
+            ctx.globalCompositeOperation = 'source-over';
+
+            if (particles.length > 0) {
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.update();
+                    p.draw();
+                    if (p.alpha <= 0) {
+                        particles.splice(i, 1);
+                    }
+                }
+            } else {
+                // 3. Khi không còn hạt nào, xóa sạch hoàn toàn để trang web sạch bóng
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        document.getElementById("launchBtn").addEventListener("click", () => {
+            let cumulativeDelay = 0;
+            for (let i = 0; i < 30; i++) {
+                let currentDelay = (i < 3) ? 250 : (i < 10) ? 150 : 50;
+                cumulativeDelay += currentDelay;
+                setTimeout(launch, cumulativeDelay);
+            }
+        });
+
+        animate();
     </script>
 </body>
 
