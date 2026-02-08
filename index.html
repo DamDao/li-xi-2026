@@ -1229,7 +1229,7 @@
                             
                             <!-- Áp dụng mệnh giá đặc biệt này cho tất cả  -->
                             <label class="form-check-label text-sm mb-1">
-                                <input type="checkbox" class="form-check-input text-sm" name="" id="" value="checkedValue" checked> Áp dụng cho tất cả 
+                                <input type="checkbox" class="form-check-input text-sm" data-apply="special" value="1"> Áp dụng cho tất cả 
                             </label>
 
                             <input type="text" 
@@ -1253,7 +1253,7 @@
                             
                             <!-- Áp dụng tùy chirng nâng cao này cho tất cả  -->
                             <label class="form-check-label text-sm mb-2">
-                                <input type="checkbox" class="form-check-input text-sm" name="" id="" value="checkedValue" checked> Áp dụng cho tất cả 
+                                <input type="checkbox" class="form-check-input text-sm" data-apply="advanced" value="1"> Áp dụng cho tất cả 
                             </label>
 
                             <!-- Số lượng bao đặc biệt -->
@@ -1416,6 +1416,56 @@
             
             // Xử lý tất cả click trong container
             container.addEventListener('click', function(e) {
+                // Apply 'special amount' to all cards when checkbox toggled
+                const applySpecialEl = e.target.closest('input.form-check-input[data-apply="special"]');
+                if (applySpecialEl) {
+                    const checked = applySpecialEl.checked;
+                    const card = applySpecialEl.closest('.setting-card');
+                    if (checked && card) {
+                        const ok = confirm('Bạn có chắc muốn áp dụng mệnh giá đặc biệt này cho tất cả các loại?');
+                        if (!ok) {
+                            applySpecialEl.checked = false;
+                            return;
+                        }
+
+                        const val = card.querySelector('.setting-input-special-amount')?.value || '';
+                        container.querySelectorAll('.setting-card').forEach(c => {
+                            if (c === card) return;
+                            const inp = c.querySelector('.setting-input-special-amount');
+                            if (inp) inp.value = val;
+                            const disp = c.querySelector('.special-amount-display');
+                            if (disp) disp.textContent = formatVND(parseNumberInput(val));
+                            updateSpecialPreview(c);
+                        });
+                    } else if (!checked) {
+                        // Nếu uncheck, không làm gì thêm (nguồn giữ nguyên)
+                    }
+                    return;
+                }
+
+                // Apply advanced (special-count) to all cards when checkbox toggled
+                const applyAdvEl = e.target.closest('input.form-check-input[data-apply="advanced"]');
+                if (applyAdvEl) {
+                    const checked = applyAdvEl.checked;
+                    const card = applyAdvEl.closest('.setting-card');
+                    if (checked && card) {
+                        const ok = confirm('Bạn có muốn áp dụng số lượng bao đặc biệt này cho tất cả các loại?');
+                        if (!ok) {
+                            applyAdvEl.checked = false;
+                            return;
+                        }
+
+                        const sc = card.querySelector('.special-count-input')?.value || '0';
+                        container.querySelectorAll('.setting-card').forEach(c => {
+                            if (c === card) return;
+                            const scInp = c.querySelector('.special-count-input');
+                            if (scInp) scInp.value = sc;
+                            updateSpecialPreview(c);
+                        });
+                    }
+                    return;
+                }
+
                  // Toggle advanced options
                 if (e.target.closest('.toggle-advanced')) {
                     const toggleBtn = e.target.closest('.toggle-advanced');
