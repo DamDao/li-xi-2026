@@ -1,0 +1,58 @@
+// ===== HÀM FORMAT TIỀN =====
+function formatMoney(amount, options = {}) {
+    const {
+        unit = "đ", // Đơn vị tiền tệ
+        showUnit = true, // Hiển thị đơn vị hay không
+        separator = ".", // Dấu phân cách hàng nghìn
+        decimals = 0, // Số chữ số thập phân
+        prefix = "", // Tiền tố (VD: "VND ")
+    } = options;
+
+    // Chuyển thành số
+    const numAmount = parseFloat(amount) || 0;
+
+    // Format với dấu phân cách
+    const formatted = numAmount
+        .toFixed(decimals)
+        .replace(/\B(?=(\d{3})+(?!\d))/g, separator);
+
+    // Ghép prefix và unit
+    return `${prefix}${formatted}${showUnit ? unit : ""}`;
+}
+
+// Shorthand cho format VND
+function formatVND(amount, showUnit = true) {
+    return formatMoney(amount, {
+        unit: "đ",
+        showUnit: showUnit,
+        separator: ".",
+    });
+}
+
+// Shorthand cho format nghìn VND (10 → 10.000đ)
+function formatThousandVND(amount) {
+    return formatMoney(amount * 1000, {
+        unit: "đ",
+        separator: ".",
+    });
+}
+// ===========================
+
+
+// ===== HÀM FORMAT INPUT =====
+function formatNumberInput(value) {
+    // Loại bỏ tất cả ký tự không phải số
+    const numbers = value.replace(/\D/g, '');
+    
+    // Nếu rỗng thì return rỗng
+    if (!numbers) return '';
+    
+    // Format với dấu chấm ngăn cách hàng nghìn
+    return parseInt(numbers).toLocaleString('vi-VN');
+}
+
+function parseNumberInput(value) {
+    // Chuyển từ "10.000" về 10000
+    return parseInt(value.replace(/\D/g, '')) || 0;
+}
+// ============================
