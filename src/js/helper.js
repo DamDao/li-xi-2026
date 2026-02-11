@@ -56,3 +56,21 @@ function parseNumberInput(value) {
     return parseInt(value.replace(/\D/g, '')) || 0;
 }
 // ============================
+
+// Random mệnh giá tròn chục (chia hết cho 10000)
+function getRandomTronChuc(min, max) {
+    // Đảm bảo min và max là tròn chục
+    const minTron = Math.ceil(min / 10000) * 10000;
+    const maxTron = Math.floor(max / 10000) * 10000;
+    
+    // Số bước (mỗi bước 10k)
+    const steps = (maxTron - minTron) / 10000;
+    
+    // Random bước
+    const randomStep = Math.floor(Math.random() * (steps + 1));
+    
+    // Tính mệnh giá
+    const amount = minTron + randomStep * 10000;
+    
+    return amount;
+}
