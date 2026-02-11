@@ -1289,9 +1289,9 @@
                             
                             <!-- Container cho các mệnh giá đặc biệt tùy chỉnh -->
                             <div class="custom-specials-container mt-2 space-y-2">
-                                <!-- Sẽ thêm sau -->
+                                <!-- Các mệnh giá đặc biệt sẽ được thêm vào đây -->
                             </div>
-                            
+
                             <!-- Tổng kết -->
                             <div class="mt-3 p-2 bg-green-50 rounded border border-green-200">
                                 <div class="text-xs text-green-700">
@@ -1310,6 +1310,50 @@
                 
                 
                 container.appendChild(card);
+
+                // Load custom specials nếu có
+                if (settings.customSpecials && settings.customSpecials.length > 0) {
+                    const customContainer = card.querySelector('.custom-specials-container');
+                    
+                    settings.customSpecials.forEach((custom, index) => {
+                        const customId = Date.now() + index;
+                        const customHTML = `
+                            <div class="custom-special-item bg-purple-50 p-3 rounded-lg border-2 border-purple-200" data-custom-id="${customId}">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-semibold text-purple-700">Mệnh giá đặc biệt #${index + 1}</span>
+                                    <button class="remove-custom-special text-red-500 hover:text-red-700 text-lg font-bold leading-none" title="Xóa">×</button>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="text-xs text-gray-600 block mb-1">Mệnh giá (VND)</label>
+                                    <input type="text" 
+                                        class="custom-special-amount w-full px-2 py-1 text-sm border border-purple-300 rounded focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                                        data-custom-id="${customId}"
+                                        inputmode="numeric"
+                                        value="${formatNumberInput(custom.amount.toString())}"
+                                        placeholder="500.000">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-600 block mb-1">Số lượng bao</label>
+                                    <div class="flex items-center gap-2">
+                                        <button class="decrease-custom-special bg-gray-300 hover:bg-gray-400 w-6 h-6 rounded text-sm font-bold">-</button>
+                                        <input type="number" 
+                                            class="custom-special-count w-12 text-center border border-gray-300 rounded py-1 text-sm"
+                                            data-custom-id="${customId}"
+                                            value="${custom.count}"
+                                            min="0"
+                                            max="24">
+                                        <button class="increase-custom-special bg-gray-300 hover:bg-gray-400 w-6 h-6 rounded text-sm font-bold">+</button>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-purple-600 italic mt-2 custom-special-preview">
+                                    ${custom.count} bao sẽ có mệnh giá ${formatVND(custom.amount)} 🎉
+                                </div>
+                            </div>
+                        `;
+                        customContainer.insertAdjacentHTML('beforeend', customHTML);
+                    });
+                }
+                
             });
         
             // Real-time update preview khi nhập
@@ -1505,6 +1549,130 @@
                         updateSpecialPreview(btn.closest('.setting-card'));
                     }
                 }
+
+                // Nút "Thêm mệnh giá đặc biệt khác"
+                if (e.target.closest('.add-custom-special')) {
+                    e.preventDefault();
+                    const btn = e.target.closest('.add-custom-special');
+                    const card = btn.closest('.setting-card');
+                    const container = card.querySelector('.custom-specials-container');
+                    
+                    // Tạo ID unique cho custom special mới
+                    const customId = Date.now();
+                    // Lấy giá trị special amount hiện tại làm mặc định
+                    // Lấy giá trị special amount hiện tại
+                    const currentSpecialAmountValue = parseNumberInput(card.querySelector('[data-field="special-amount"]').value) || 500000;
+                    
+                    // Tìm giá trị cao nhất trong các custom đã có
+                    const existingCustoms = card.querySelectorAll('.custom-special-item');
+                    let maxExistingAmount = currentSpecialAmountValue;
+                    
+                    existingCustoms.forEach(item => {
+                        const amt = parseNumberInput(item.querySelector('.custom-special-amount').value);
+                        if (amt > maxExistingAmount) maxExistingAmount = amt;
+                    });
+                    
+                    // Tăng lên 50k từ giá trị cao nhất 
+                    const newSpecialAmount = Math.round(maxExistingAmount * 2);
+                    
+                    // Format lại
+                    const currentSpecialAmount = formatNumberInput(newSpecialAmount.toString());
+                    
+
+                    // Tạo HTML cho custom special
+                    const customSpecialHTML = `
+                        <div class="custom-special-item bg-purple-50 p-3 rounded-lg border-2 border-purple-200" data-custom-id="${customId}">
+                            <!-- Nút xóa -->
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-semibold text-purple-700">Mệnh giá đặc biệt #${(container?.children?.length || 0) + 1}</span>
+                                <button class="remove-custom-special text-red-500 hover:text-red-700 text-lg font-bold leading-none" title="Xóa">×</button>
+                            </div>
+                            
+                            <!-- Input mệnh giá -->
+                            <div class="mb-2">
+                                <label class="text-xs text-gray-600 block mb-1">Mệnh giá (VND)</label>
+                                <input type="text" 
+                                    class="custom-special-amount w-full px-2 py-1 text-sm border border-purple-300 rounded focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                                    data-custom-id="${customId}"
+                                    inputmode="numeric"
+                                    value="${currentSpecialAmount}"
+                                    placeholder="500.000">
+                            </div>
+                            
+                            <!-- Số lượng bao -->
+                            <div>
+                                <label class="text-xs text-gray-600 block mb-1">Số lượng bao</label>
+                                <div class="flex items-center gap-2">
+                                    <button class="decrease-custom-special bg-gray-300 hover:bg-gray-400 w-6 h-6 rounded text-sm font-bold">-</button>
+                                    <input type="number" 
+                                        class="custom-special-count w-12 text-center border border-gray-300 rounded py-1 text-sm"
+                                        data-custom-id="${customId}"
+                                        value="1"
+                                        min="0"
+                                        max="24">
+                                    <button class="increase-custom-special bg-gray-300 hover:bg-gray-400 w-6 h-6 rounded text-sm font-bold">+</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Preview -->
+                            <div class="text-xs text-purple-600 italic mt-2 custom-special-preview">
+                                1 bao sẽ có mệnh giá 0đ 🎉
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Thêm vào container
+                    container.insertAdjacentHTML('beforeend', customSpecialHTML);
+                    
+                    // Update tổng kết
+                    updateSpecialPreview(card);
+                }
+
+
+                // Nút xóa custom special
+                if (e.target.closest('.remove-custom-special')) {
+                    const btn = e.target.closest('.remove-custom-special');
+                    const item = btn.closest('.custom-special-item');
+                    const card = btn.closest('.setting-card');
+                    
+                    if (confirm('Bạn có chắc muốn xóa mệnh giá đặc biệt này?')) {
+                        item.remove();
+                        
+                        // Cập nhật lại số thứ tự
+                        const container = card.querySelector('.custom-specials-container');
+                        container.querySelectorAll('.custom-special-item').forEach((item, index) => {
+                            item.querySelector('span.text-xs.font-semibold').textContent = `Mệnh giá đặc biệt #${index + 1}`;
+                        });
+                        
+                        // Update tổng kết
+                        updateSpecialPreview(card);
+                    }
+                }
+
+                // Nút giảm custom special
+                if (e.target.closest('.decrease-custom-special')) {
+                    const btn = e.target.closest('.decrease-custom-special');
+                    const input = btn.parentElement.querySelector('.custom-special-count');
+                    const currentValue = parseInt(input.value) || 0;
+                    if (currentValue > 0) {
+                        input.value = currentValue - 1;
+                        updateCustomSpecialPreview(btn.closest('.custom-special-item'));
+                        updateSpecialPreview(btn.closest('.setting-card'));
+                    }
+                }
+
+                // Nút tăng custom special
+                if (e.target.closest('.increase-custom-special')) {
+                    const btn = e.target.closest('.increase-custom-special');
+                    const input = btn.parentElement.querySelector('.custom-special-count');
+                    const currentValue = parseInt(input.value) || 0;
+                    if (currentValue < 24) {
+                        input.value = currentValue + 1;
+                        updateCustomSpecialPreview(btn.closest('.custom-special-item'));
+                        updateSpecialPreview(btn.closest('.setting-card'));
+                    }
+                }
+
             });
             
             // Xử lý input
@@ -1520,24 +1688,90 @@
                 // MỚI: Xử lý khi thay đổi special amount
                 if (e.target.classList.contains('setting-input-special-amount')) {
                     const card = e.target.closest('.setting-card');
+                    const input = e.target;
                     
-                    // Lưu vị trí con trỏ
-                    const cursorPosition = e.target.selectionStart;
-                    const oldLength = e.target.value.length;
+                    // Lưu vị trí con trỏ và giá trị cũ
+                    const cursorPosition = input.selectionStart;
+                    const oldValue = input.value;
                     
                     // Format input
-                    const rawValue = e.target.value;
+                    const rawValue = input.value;
                     const formattedValue = formatNumberInput(rawValue);
-                    e.target.value = formattedValue;
                     
-                    // Điều chỉnh lại vị trí con trỏ
-                    const newLength = formattedValue.length;
-                    const lengthDiff = newLength - oldLength;
-                    e.target.selectionStart = e.target.selectionEnd = cursorPosition + lengthDiff;
+                    // Chỉ update nếu giá trị thay đổi
+                    if (formattedValue !== oldValue) {
+                        input.value = formattedValue;
+                        
+                        // Tính toán vị trí cursor mới dựa trên số dấu chấm
+                        const dotsBeforeCursorOld = (oldValue.substring(0, cursorPosition).match(/\./g) || []).length;
+                        const dotsBeforeCursorNew = (formattedValue.substring(0, cursorPosition).match(/\./g) || []).length;
+                        
+                        const dotsDiff = dotsBeforeCursorNew - dotsBeforeCursorOld;
+                        let newCursorPosition = cursorPosition + dotsDiff;
+                        
+                        newCursorPosition = Math.max(0, Math.min(newCursorPosition, formattedValue.length));
+                        
+                        input.selectionStart = input.selectionEnd = newCursorPosition;
+                    }
                     
                     // Update preview
                     updateSpecialPreview(card);
                 }
+
+                // Xử lý custom special amount input
+                if (e.target.classList.contains('custom-special-amount')) {
+                    const input = e.target;
+                    const item = input.closest('.custom-special-item');
+                    const card = input.closest('.setting-card');
+                    
+                    // Lưu vị trí con trỏ và giá trị cũ
+                    const cursorPosition = input.selectionStart;
+                    const oldValue = input.value;
+                    
+                    // Format input
+                    const rawValue = input.value;
+                    const formattedValue = formatNumberInput(rawValue);
+                    
+                    // Chỉ update nếu giá trị thay đổi
+                    if (formattedValue !== oldValue) {
+                        input.value = formattedValue;
+                        
+                        // Tính toán vị trí cursor mới
+                        // Đếm số dấu chấm trước cursor
+                        const dotsBeforeCursorOld = (oldValue.substring(0, cursorPosition).match(/\./g) || []).length;
+                        const dotsBeforeCursorNew = (formattedValue.substring(0, cursorPosition).match(/\./g) || []).length;
+                        
+                        // Điều chỉnh cursor dựa trên số dấu chấm thay đổi
+                        const dotsDiff = dotsBeforeCursorNew - dotsBeforeCursorOld;
+                        let newCursorPosition = cursorPosition + dotsDiff;
+                        
+                        // Đảm bảo cursor không vượt quá độ dài
+                        newCursorPosition = Math.max(0, Math.min(newCursorPosition, formattedValue.length));
+                        
+                        input.selectionStart = input.selectionEnd = newCursorPosition;
+                    }
+                    
+                    // Update preview của custom special này
+                    updateCustomSpecialPreview(item);
+                    
+                    // Update tổng kết
+                    updateSpecialPreview(card);
+                }
+
+                // Xử lý custom special count input
+                if (e.target.classList.contains('custom-special-count')) {
+                    let value = parseInt(e.target.value) || 0;
+                    if (value < 0) value = 0;
+                    if (value > 24) value = 24;
+                    e.target.value = value;
+                    
+                    const item = e.target.closest('.custom-special-item');
+                    const card = e.target.closest('.setting-card');
+                    
+                    updateCustomSpecialPreview(item);
+                    updateSpecialPreview(card);
+                }
+
             });
             
             isEventDelegationSetup = true;
@@ -1567,17 +1801,68 @@
             }
             
             // Cập nhật phân bố tổng quát
-            const normalCount = 24 - specialCount;
+            // Tính tổng số bao đặc biệt (bao chính + custom)
+            let totalSpecialCount = specialCount;
+
+            // Lấy tất cả custom specials
+            const customSpecials = card.querySelectorAll('.custom-special-item');
+            const customSpecialsList = [];
+
+            customSpecials.forEach(item => {
+                const amount = parseNumberInput(item.querySelector('.custom-special-amount').value);
+                const count = parseInt(item.querySelector('.custom-special-count').value) || 0;
+                
+                totalSpecialCount += count;
+                
+                if (count > 0) {
+                    customSpecialsList.push({ amount, count });
+                }
+            });
+
+            // Cập nhật số bao thường
+            const normalCount = 24 - totalSpecialCount;
             card.querySelector('.normal-count-preview').textContent = `${normalCount} bao`;
-            
+
+            // Hiển thị danh sách đặc biệt
             const specialList = card.querySelector('.special-count-preview-list');
+            let specialHTML = '';
+
+            // Bao đặc biệt chính
             if (specialCount > 0) {
-                specialList.innerHTML = `<div>• <span class="font-semibold text-yellow-600">${specialCount} bao ĐẶC BIỆT</span>: ${formatVND(specialAmount)} 🌟</div>`;
-            } else {
-                specialList.innerHTML = '';
+                specialHTML += `<div>• <span class="font-semibold text-yellow-600">${specialCount} bao ĐẶC BIỆT</span>: ${formatVND(specialAmount)} 🌟</div>`;
+            }
+
+            // Các bao custom
+            customSpecialsList.forEach((custom, index) => {
+                specialHTML += `<div>• <span class="font-semibold text-purple-600">${custom.count} bao ĐẶC BIỆT #${index + 2}</span>: ${formatVND(custom.amount)} 💎</div>`;
+            });
+
+            specialList.innerHTML = specialHTML;
+
+            // Cảnh báo nếu tổng > 24
+            if (totalSpecialCount > 24) {
+                specialList.innerHTML += `<div class="text-red-600 font-bold mt-1">⚠️ Tổng số bao đặc biệt vượt quá 24!</div>`;
             }
         }
         // ================================================
+
+        // Hàm cập nhật preview cho custom special item
+        function updateCustomSpecialPreview(item) {
+            const amountInput = item.querySelector('.custom-special-amount');
+            const countInput = item.querySelector('.custom-special-count');
+            const preview = item.querySelector('.custom-special-preview');
+            
+            const amount = parseNumberInput(amountInput.value);
+            const count = parseInt(countInput.value) || 0;
+            
+            if (count === 0) {
+                preview.textContent = `0 bao sẽ có mệnh giá ${formatVND(amount)}`;
+            } else if (count === 1) {
+                preview.textContent = `1 bao sẽ có mệnh giá ${formatVND(amount)} 🎉`;
+            } else {
+                preview.textContent = `${count} bao sẽ có mệnh giá ${formatVND(amount)} 🎉`;
+            }
+        }
 
 
         // Đóng modal
@@ -1596,35 +1881,38 @@
         saveSettings.addEventListener('click', function() {
             const settings = {};
             
-            // Lấy tất cả input trong form
-            document.querySelectorAll('#settings-form-container input').forEach(input => {
-                const recipient = input.dataset.recipient;
-                const field = input.dataset.field;
+            // Loop qua từng card để lấy đầy đủ thông tin
+            document.querySelectorAll('.setting-card').forEach(card => {
+                const recipient = card.dataset.recipient;
                 
-                let value;
-                if (field === 'special-count') {
-                    // Với special-count, lấy giá trị số nguyên
-                    value = parseInt(input.value) || 0;
-                } else {
-                    // Với min/max, parse từ format "10.000" về 10000
-                    value = parseNumberInput(input.value);
-                }
+                // Lấy các giá trị cơ bản
+                const minValue = parseNumberInput(card.querySelector('[data-field="min"]').value);
+                const maxValue = parseNumberInput(card.querySelector('[data-field="max"]').value);
+                const specialAmount = parseNumberInput(card.querySelector('[data-field="special-amount"]').value);
+                const specialCount = parseInt(card.querySelector('[data-field="special-count"]').value) || 0;
                 
-                if (!settings[recipient]) {
-                    settings[recipient] = {};
-                }
+                // Lưu vào settings
+                settings[recipient] = {
+                    min: minValue,
+                    max: maxValue,
+                    specialAmount: specialAmount,
+                    specialCount: specialCount
+                };
                 
-                // Lưu theo tên field phù hợp
-                if (field === 'min') {
-                    settings[recipient].min = value;
-                } else if (field === 'max') {
-                    settings[recipient].max = value;
-                } else if (field === 'special-amount') {
-                    settings[recipient].specialAmount = value;
-                } else if (field === 'special-count') {
-                    settings[recipient].specialCount = value;
+                // Lưu custom specials nếu có
+                const customSpecials = [];
+                card.querySelectorAll('.custom-special-item').forEach(item => {
+                    const amount = parseNumberInput(item.querySelector('.custom-special-amount').value);
+                    const count = parseInt(item.querySelector('.custom-special-count').value) || 0;
+                    
+                    if (count > 0 && amount > 0) {
+                        customSpecials.push({ amount, count });
+                    }
+                });
+                
+                if (customSpecials.length > 0) {
+                    settings[recipient].customSpecials = customSpecials;
                 }
-
             });
             
             // Validate: min phải < max
@@ -1640,6 +1928,8 @@
             
             // Lưu vào localStorage
             localStorage.setItem('envelopeSettings', JSON.stringify(settings));
+            
+            console.log('Đã lưu settings:', settings); // Debug
             
             alert('✅ Đã lưu cài đặt thành công!');
             settingsModal.classList.add('hidden');
