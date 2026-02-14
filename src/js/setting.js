@@ -875,3 +875,226 @@ function getEnvelopeSettingsFor(recipientKey) {
     return { ...DEFAULT_ENVELOPE_SETTINGS };
 }
 // end Lấy settings
+
+// ===== AUTO-SYNC URL WITH SETTINGS (REAL-TIME) =====
+
+// Hàm encode settings thành URL param
+function encodeSettingsToURL(settings) {
+    try {
+        const json = JSON.stringify(settings);
+        const base64 = btoa(unescape(encodeURIComponent(json)));
+        return base64;
+    } catch (e) {
+        console.error('Lỗi encode settings:', e);
+        return null;
+    }
+}
+
+// Hàm decode settings từ URL param
+function decodeSettingsFromURL(base64String) {
+    try {
+        const json = decodeURIComponent(escape(atob(base64String)));
+        return JSON.parse(json);
+    } catch (e) {
+        console.error('Lỗi decode settings từ URL:', e);
+        return null;
+    }
+}
+
+// Hàm update URL (không reload page)
+function updateURLWithSettings(settings) {
+    const encoded = encodeSettingsToURL(settings);
+    if (!encoded) return;
+    
+    const url = new URL(window.location);
+    url.searchParams.set('s', encoded);
+    
+    // Update URL without reload
+    window.history.replaceState({}, '', url);
+    
+    console.log('[URL SYNC] ✅ URL đã cập nhật');
+}
+
+// Hàm thu thập settings từ form hiện tại
+function collectCurrentSettings() {
+    const settings = {};
+    
+    document.querySelectorAll('.setting-card').forEach(card => {
+        const recipient = card.dataset.recipient;
+        
+        const minInput = card.querySelector('[data-field="min"]');
+        const maxInput = card.querySelector('[data-field="max"]');
+        const specialAmountInput = card.querySelector('[data-field="special-amount"]');
+        const specialCountInput = card.querySelector('.special-count-input');
+        
+        if (!minInput || !maxInput || !specialAmountInput || !specialCountInput) return;
+        
+        const minValue = parseNumberInput(minInput.value);
+        const maxValue = parseNumberInput(maxInput.value);
+        const specialAmount = parseNumberInput(specialAmountInput.value);
+        const specialCount = parseInt(specialCountInput.value) || 0;
+        
+        settings[recipient] = {
+            min: minValue,
+            max: maxValue,
+            specialAmount: specialAmount,
+            specialCount: specialCount
+        };
+        
+        // Custom specials
+        const customSpecials = [];
+        card.querySelectorAll('.custom-special-item').forEach(item => {
+            const amount = parseNumberInput(item.querySelector('.custom-special-amount').value);
+            const count = parseInt(item.querySelector('.custom-special-count').value) || 0;
+            if (count > 0 && amount > 0) {
+                customSpecials.push({ amount, count });
+            }
+        });
+        
+        if (customSpecials.length > 0) {
+            settings[recipient].customSpecials = customSpecials;
+        }
+    });
+    
+    return settings;
+}
+
+// Debounce function
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Auto-update URL (debounced)
+const autoUpdateURL = debounce(() => {
+    const settings = collectCurrentSettings();
+    updateURLWithSettings(settings);
+}, 1000);
+
+// Load settings từ URL khi page load
+function loadSettingsFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const settingsParam = urlParams.get('s');
+    
+    if (!settingsParam) return false;
+    
+    const decodedSettings = decodeSettingsFromURL(settingsParam);
+    if (!decodedSettings) {
+        console.warn('URL settings không hợp lệ');
+        return false;
+    }
+    
+    // Lưu vào localStorage
+    localStorage.setItem('envelopeSettings', JSON.stringify(decodedSettings));
+    console.log('[URL LOAD] Đã load settings từ URL:', decodedSettings);
+    
+    // Xóa cache
+    Object.keys(recipientNames).forEach(key => {
+        localStorage.removeItem(`envelopeAmounts_${key}`);
+    });
+    
+    return true;
+}
+
+// Toast notification
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Gọi khi page load
+window.addEventListener('DOMContentLoaded', function() {
+    const loaded = loadSettingsFromURL();
+    if (loaded) {
+        showToast('🎉 Đã load cài đặt từ link chia sẻ!');
+    }
+});
+
+// ===== GẮNG AUTO-UPDATE VÀO EVENT DELEGATION HIỆN CÓ =====
+// Tìm phần event delegation đã có và thêm auto-update vào đó
+
+// CÁCH 1: Gắn vào event delegation container (đã có sẵn)
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('settings-form-container');
+    
+    // Gắn listener cho input events
+    container.addEventListener('input', function(e) {
+        // Kiểm tra xem input có phải là setting field không
+        if (e.target.classList.contains('setting-input-min') ||
+            e.target.classList.contains('setting-input-max') ||
+            e.target.classList.contains('setting-input-special-amount') ||
+            e.target.classList.contains('special-count-input') ||
+            e.target.classList.contains('custom-special-amount') ||
+            e.target.classList.contains('custom-special-count')) {
+            
+            console.log('[URL SYNC] Input thay đổi, chuẩn bị update URL...');
+            autoUpdateURL();
+        }
+    });
+    
+    // Gắn listener cho click events
+    container.addEventListener('click', function(e) {
+        if (e.target.closest('.toggle-advanced') ||
+            e.target.closest('.add-custom-special') ||
+            e.target.closest('.remove-custom-special') ||
+            e.target.closest('.increase-special') ||
+            e.target.closest('.decrease-special') ||
+            e.target.closest('.increase-custom-special') ||
+            e.target.closest('.decrease-custom-special')) {
+            
+            console.log('[URL SYNC] Click thay đổi settings, chuẩn bị update URL...');
+            setTimeout(autoUpdateURL, 200);
+        }
+    });
+    
+    console.log('[URL SYNC] ✅ Đã kích hoạt auto-sync URL');
+});
+
+// ===== END AUTO-SYNC URL =====
+// ===== AUTO-ADD URL PARAM KHI PAGE LOAD =====
+window.addEventListener('DOMContentLoaded', function() {
+    // Kiểm tra xem URL đã có param 's' chưa
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasSettingsParam = urlParams.has('s');
+    
+    if (!hasSettingsParam) {
+        // Nếu chưa có → Lấy settings từ localStorage và add vào URL
+        const savedSettings = localStorage.getItem('envelopeSettings');
+        
+        if (savedSettings) {
+            try {
+                const settings = JSON.parse(savedSettings);
+                updateURLWithSettings(settings);
+                console.log('[URL SYNC] ✅ Đã thêm param vào URL từ localStorage khi page load');
+            } catch (e) {
+                console.warn('[URL SYNC] Không thể parse localStorage settings:', e);
+            }
+        } else {
+            // Nếu localStorage cũng chưa có → Dùng default settings
+            const defaultSettings = {};
+            Object.keys(recipientNames).forEach(key => {
+                defaultSettings[key] = { ...DEFAULT_ENVELOPE_SETTINGS };
+            });
+            updateURLWithSettings(defaultSettings);
+            console.log('[URL SYNC] ✅ Đã thêm param vào URL từ default settings khi page load');
+        }
+    } else {
+        console.log('[URL SYNC] URL đã có param, không cần thêm');
+    }
+});
+// ===== END AUTO-ADD URL PARAM =====
