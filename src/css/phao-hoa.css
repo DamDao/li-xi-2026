@@ -1,5 +1,7 @@
 
-canvas {
+/* Scope fireworks styles only to the main fireworks canvas so other canvases
+   (eg. #scratch-canvas) are not affected by these global rules. */
+#fireworksCanvas {
     position: fixed; /* Cố định toàn màn hình */
     top: 0;
     left: 0;

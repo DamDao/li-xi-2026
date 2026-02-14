@@ -789,6 +789,40 @@ body {
     }
 }
 
+/* Mobile: force 3 items per row for small screens and tighten spacing */
+@media (max-width: 640px) {
+    .envelopes-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .gold-seal{
+        width: 40px;
+        height: 40px;
+    }
+
+    .envelope-item {
+        aspect-ratio: 3 / 4; /* keep proportions but slightly more compact */
+        min-width: 0;
+    }
+
+    .envelope-number {
+        font-size: 10px;
+        padding: 4px 6px;
+        bottom: 10px;
+    }
+
+    /* Tweak launch button on small screens so it doesn't overlap */
+    #launchBtn {
+        width: 48px;
+        height: 48px;
+        bottom: 16px;
+        font-size: 20px;
+    }
+
+}
+
 /* <!-- End CSS phần grid layout danh sách bao lì xì --> */
 
 /* MOdal tâm thư lộc xuân CSS phần font Dancing Script */
@@ -854,6 +888,49 @@ body {
 
 .envelope-item .amount-display.show {
     opacity: 1;
+}
+
+/* Mobile overrides placed after the general rule so they take precedence
+   on small screens. */
+@media (max-width: 640px) {
+
+    .lucky-message{
+        top: 10px !important;
+    }
+
+    .gold-seal{
+        width: 35px;
+        height: 35px;
+    }
+
+    .envelope-item {
+        aspect-ratio: 3 / 4; /* keep proportions but slightly more compact */
+        min-width: 0;
+    }
+
+    .envelope-number {
+        font-size: 10px;
+        padding: 4px 6px;
+        bottom: 10px;
+    }
+
+    /* Tweak launch button on small screens so it doesn't overlap */
+    #launchBtn {
+        width: 48px;
+        height: 48px;
+        bottom: 16px;
+        font-size: 20px;
+    }
+
+    .envelope-item.opened::before{
+        padding: 5px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .envelope-item .amount-display{
+        padding: 3px 8px;
+        bottom: 35px;
+    }
 }
 
 .envelope-item .amount-display::after {

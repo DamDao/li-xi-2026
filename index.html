@@ -302,13 +302,13 @@
         <!-- Main Content -->
         <div class="min-h-full flex flex-col items-center justify-center px-2 sm:px-4 py-8 relative z-10">
             <!-- Header Section -->
-            <div class="text-center mb-8 md:mb-12">
+            <div class="text-center mb-6">
                 <!-- Tagline -->
                 <p id="tagline" class="text-tet-cream/80 text-sm md:text-base tracking-widest mb-4 font-light">
                     Gửi trao yêu thương – Nhận lộc an khang
                 </p>
                 <!-- Main Heading -->
-                <h1 id="main-heading" class="font-heading text-3xl md:text-5xl lg:text-6xl font-bold gold-shimmer mb-2">
+                <h1 id="main-heading" class="font-heading text-2xl md:text-5xl lg:text-6xl font-bold gold-shimmer mb-2">
                     Người trao đang gửi lộc xuân cho..?
                 </h1>
                 <!-- Decorative line -->
@@ -451,7 +451,7 @@
             <!-- Envelopes Grid (hidden by default) -->
             <div id="envelopes-container" class="hidden max-w-6xl mx-auto w-full px-2 sm:px-4 ">
                 <div class="text-center mb-8">
-                    <h2 class="font-heading text-2xl md:text-3xl font-bold gold-shimmer mb-4">
+                    <h2 class="font-heading text-xl md:text-3xl font-bold gold-shimmer mb-4">
                         24 Bao Lì Xì Yêu Thương
                     </h2>
                     <p class="text-tet-cream/70 text-sm md:text-base">
@@ -468,23 +468,24 @@
                     <!-- 24 envelopes will be generated here -->
                 </div>
 
-                <div class="text-center">
+                <!-- Nút Xáo Trộn & Show Mệnh Giá -->
+                <div class="text-center flex flex-wrap gap-4 justify-center">
+                    <button id="reshuffle-envelopes" class="bg-gradient-to-r from-tet-gold to-tet-gold-dark text-tet-red font-bold px-8 py-3 rounded-full shadow-lg hover:shadow-tet-gold/50 hover:scale-105 transition-all">
+                        🔄 Xáo trộn
+                    </button>
+                    <button id="show-amounts-btn" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold px-8 py-3 rounded-full shadow-lg hover:shadow-blue-500/50 hover:scale-105 transition-all" title="Hiển thị mệnh giá ngoài bao lì xì">
+                        💰 Minh bạch
+                    </button>
+                </div>
+
+
+                <div class="text-center mt-6 ">
                     <button id="back-btn"
                         class="bg-tet-red-light text-tet-cream font-medium px-6 py-2 rounded-full hover:bg-tet-red transition-all duration-300">
                         ← Quay lại chọn mục người nhận
                     </button>
                 </div>
-                
-                <!-- Nút Xáo Trộn & Show Mệnh Giá -->
-                <div class="text-center mt-6 flex flex-wrap gap-4 justify-center">
-                    <button id="reshuffle-envelopes" class="bg-gradient-to-r from-tet-gold to-tet-gold-dark text-tet-red font-bold px-8 py-3 rounded-full shadow-lg hover:shadow-tet-gold/50 hover:scale-105 transition-all">
-                        🔄 Xáo trộn mệnh giá
-                    </button>
-                    <button id="show-amounts-btn" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold px-8 py-3 rounded-full shadow-lg hover:shadow-blue-500/50 hover:scale-105 transition-all" title="Hiển thị mệnh giá ngoài bao lì xì">
-                        💰 Hiển thị mệnh giá
-                    </button>
-                </div>
-
+            
             </div>
 
             <!-- Footer -->
