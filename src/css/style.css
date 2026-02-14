@@ -831,6 +831,80 @@ body {
     pointer-events: none;
 }
 
+/* <!-- ===== HIỂN THỊ MỆNH GIÁ NGOÀI BAO LÌ XÌ ===== --> */
+.envelope-item .amount-display {
+    position: absolute;
+    bottom: 66px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 200, 0, 0.95));
+    color: #8b0000;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 13px;
+    white-space: nowrap;
+    border: 2px solid #ffd700;
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+}
+
+.envelope-item .amount-display.show {
+    opacity: 1;
+}
+
+.envelope-item .amount-display::after {
+    content: "₫";
+    margin-left: 3px;
+    font-size: 12px;
+}
+
+/* Điều chỉnh grid khi hiển thị mệnh giá */
+#envelopes-grid.show-amounts {
+    padding-top: 50px;
+}
+
+/* <!-- ===== END HIỂN THỊ MỆNH GIÁ ===== --> */
+
+/* <!-- ===== ENVELOPE ĐÃ MỞ ===== --> */
+.envelope-item.opened .envelope-body {
+    opacity: 0.5;
+    filter: grayscale(90%) brightness(0.85);
+}
+
+.envelope-item.opened .gold-seal,
+.envelope-item.opened .silver-seal,
+.envelope-item.opened .bronze-seal {
+    opacity: 0.4;
+}
+
+.envelope-item.opened::before {
+    content: "✓ ĐÃ MỞ";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.95), rgba(16, 185, 129, 0.95));
+    color: white;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 13px;
+    font-weight: bold;
+    z-index: 100;
+    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+    pointer-events: auto;
+}
+
+.envelope-item.opened {
+    pointer-events: none;
+}
+
+/* <!-- ===== END ENVELOPE ĐÃ MỞ ===== --> */
+
 /* <!-- ===== THIỆP BÊN NGOÀI (COVER) ===== --> */
 /* ===== COVER CARD ===== */
 /* <!-- ===== END COVER ===== --> */

@@ -386,10 +386,13 @@
                     </button>
                 </div>
                 
-                <!-- THÊM NÚT NÀY NGAY DƯỚI -->
-                <div class="text-center mt-6">
+                <!-- Nút Xáo Trộn & Show Mệnh Giá -->
+                <div class="text-center mt-6 flex flex-wrap gap-4 justify-center">
                     <button id="reshuffle-envelopes" class="bg-gradient-to-r from-tet-gold to-tet-gold-dark text-tet-red font-bold px-8 py-3 rounded-full shadow-lg hover:shadow-tet-gold/50 hover:scale-105 transition-all">
-                        🔄 Xáo trộn 
+                        🔄 Xáo trộn mệnh giá
+                    </button>
+                    <button id="show-amounts-btn" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold px-8 py-3 rounded-full shadow-lg hover:shadow-blue-500/50 hover:scale-105 transition-all" title="Hiển thị mệnh giá ngoài bao lì xì">
+                        💰 Hiển thị mệnh giá
                     </button>
                 </div>
 
@@ -691,6 +694,13 @@
                 
                 // (Tùy chọn) Thêm data-number để dễ lấy sau
                 envelope.dataset.number = i;
+                envelope.dataset.opened = "false";
+                
+                // Thêm phần tử hiển thị mệnh giá
+                const amountDisplay = document.createElement('div');
+                amountDisplay.className = 'amount-display';
+                amountDisplay.textContent = new Intl.NumberFormat('vi-VN').format(amounts[i - 1]);
+                envelope.appendChild(amountDisplay);
                 
                 envelopesGrid.appendChild(envelope);
             }
@@ -724,15 +734,85 @@
                 const envelope = createEnvelope(i);
                 envelope.dataset.fixedAmount = amounts[i - 1];
                 envelope.dataset.number = i;
+                envelope.dataset.opened = "false";
+                
+                // Thêm phần tử hiển thị mệnh giá
+                const amountDisplay = document.createElement('div');
+                amountDisplay.className = 'amount-display';
+                amountDisplay.textContent = new Intl.NumberFormat('vi-VN').format(amounts[i - 1]);
+                envelope.appendChild(amountDisplay);
+                
                 envelopesGrid.appendChild(envelope);
             }
         });
+
+        // Show/Hide Amounts button
+        document.getElementById("show-amounts-btn").addEventListener("click", function () {
+            const envelopesGrid = document.getElementById("envelopes-grid");
+            const amountDisplays = document.querySelectorAll(".amount-display");
+            
+            // Toggle class cho grid
+            envelopesGrid.classList.toggle("show-amounts");
+            
+            // Toggle class cho từng amount display
+            amountDisplays.forEach(display => {
+                display.classList.toggle("show");
+            });
+            
+            // Đổi text button
+            const btn = document.getElementById("show-amounts-btn");
+            if (envelopesGrid.classList.contains("show-amounts")) {
+                btn.textContent = "🙈 Ẩn mệnh giá";
+            } else {
+                btn.textContent = "💰 Hiển thị mệnh giá";
+            }
+        });
+
+        // Reshuffle button
+        document.getElementById("reshuffle-envelopes").addEventListener("click", function () {
+            if (!selectedRecipient) return;
+            
+            const storageKey = `envelopeAmounts_${selectedRecipient}`;
+            const amounts = generateFixedAmountsForRecipient(selectedRecipient);
+            localStorage.setItem(storageKey, JSON.stringify(amounts));
+            
+            const envelopesGrid = document.getElementById("envelopes-grid");
+            envelopesGrid.innerHTML = "";
+            
+            // Tạo 24 envelope mới với mệnh giá xáo trộn
+            for (let i = 1; i <= 24; i++) {
+                const envelope = createEnvelope(i);
+                envelope.dataset.fixedAmount = amounts[i - 1];
+                envelope.dataset.number = i;
+                envelope.dataset.opened = "false";
+                
+                // Thêm phần tử hiển thị mệnh giá
+                const amountDisplay = document.createElement('div');
+                amountDisplay.className = 'amount-display';
+                amountDisplay.textContent = new Intl.NumberFormat('vi-VN').format(amounts[i - 1]);
+                if (envelopesGrid.classList.contains("show-amounts")) {
+                    amountDisplay.classList.add("show");
+                }
+                envelope.appendChild(amountDisplay);
+                
+                envelopesGrid.appendChild(envelope);
+            }
+            
+            console.log(`Xáo trộn lại bộ mệnh giá cho ${selectedRecipient}`);
+        })
 
 
         // Back button - Return to main selection
         document
             .getElementById("back-btn")
             .addEventListener("click", function () {
+                // Reset trạng thái "đã mở" khi quay về
+                const envelopes = document.querySelectorAll(".envelope-item");
+                envelopes.forEach(env => {
+                    env.classList.remove('opened');
+                    env.dataset.opened = "false";
+                });
+                
                 // Hide envelopes container
                 document
                     .getElementById("envelopes-container")
@@ -982,6 +1062,13 @@
 
             const modal = document.getElementById('heart-letter-modal');
             modal.classList.remove('hidden');
+            
+            // Đánh dấu envelope đã mở (chỉ trong phiên hiện tại)
+            const envelopeElement = document.querySelector(`.envelope-item[data-number="${envelopeNumber}"]`);
+            if (envelopeElement && envelopeElement.dataset.opened !== "true") {
+                envelopeElement.classList.add('opened');
+                envelopeElement.dataset.opened = "true";
+            }
             
             // Truyền envelopeNumber để lấy mệnh giá đúng
             initScratchCard(envelopeNumber);
