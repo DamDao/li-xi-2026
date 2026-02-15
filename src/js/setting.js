@@ -909,6 +909,11 @@ function updateURLWithSettings(settings) {
     const url = new URL(window.location);
     url.searchParams.set('s', encoded);
     
+     // Giữ nguyên param 'name' nếu có
+    if (senderName) {
+        url.searchParams.set('name', encodeURIComponent(senderName));
+    }
+    
     // Update URL without reload
     window.history.replaceState({}, '', url);
     
