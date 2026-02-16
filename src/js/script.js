@@ -26,14 +26,14 @@ class Rocket {
 
     this.velocity = {
       x: angleX,
-      y: -12.5 - Math.random() * 2.5,
+      y: -12.5 - Math.random() * 3.2,
     };
 
     this.gravity = 0.105;
     this.friction = 0.995;
 
     this.trail = [];
-    this.trailLength = 7;
+    this.trailLength = 5;
     while (this.trailLength--) this.trail.push([this.x, this.y]);
   }
 
@@ -156,7 +156,7 @@ function animate() {
 
   // fade trail (ánh sáng A)
   ctx.globalCompositeOperation = "destination-out";
-  ctx.fillStyle = "rgba(0,0,0,0.06)";
+  ctx.fillStyle = "rgba(0,0,0,0.32)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // glow blend A
