@@ -517,8 +517,8 @@
                 </div> -->
 
                 <div id="envelopes-grid"
-                    class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-5 mb-12">
-                    <!-- 24 envelopes will be generated here -->
+                    class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-3 sm:gap-4 md:gap-5 mb-12">
+                    <!-- Envelopes will be generated here based on TOTAL_ENVELOPES -->
                 </div>
 
                 <!-- Nút Xáo Trộn & Show Mệnh Giá -->
@@ -857,17 +857,17 @@
             // Lấy bộ mệnh giá đã lưu (nếu có)
             let amounts = JSON.parse(localStorage.getItem(storageKey));
 
-            // Nếu chưa có hoặc không đủ 24 → tạo mới 1 lần
-            if (!amounts || amounts.length !== 24) {
+            // Nếu chưa có hoặc không đủ TOTAL_ENVELOPES → tạo mới 1 lần
+            if (!amounts || amounts.length !== TOTAL_ENVELOPES) {
                 amounts = generateFixedAmountsForRecipient(selectedRecipient);
                 localStorage.setItem(storageKey, JSON.stringify(amounts));
-                console.log(`Tạo mới bộ 24 mệnh giá cố định cho ${selectedRecipient}`);
+                console.log(`Tạo mới bộ ${TOTAL_ENVELOPES} mệnh giá cố định cho ${selectedRecipient}`);
             } else {
                 console.log(`Sử dụng bộ mệnh giá đã lưu cho ${selectedRecipient}`);
             }
 
-            // Tạo 24 envelope và gán mệnh giá cố định
-            for (let i = 1; i <= 24; i++) {
+            // Tạo TOTAL_ENVELOPES envelope và gán mệnh giá cố định
+            for (let i = 1; i <= TOTAL_ENVELOPES; i++) {
                 const envelope = createEnvelope(i);
                 
                 // Gán mệnh giá cố định vào data attribute
@@ -908,10 +908,10 @@
             // LUÔN TẠO BỘ MỚI MỖI LẦN CONTINUE (xáo trộn lại)
             const amounts = generateFixedAmountsForRecipient(selectedRecipient);
             localStorage.setItem(storageKey, JSON.stringify(amounts));
-            console.log(`[ALWAYS NEW] Đã tạo/xáo trộn lại bộ 24 mệnh giá mới cho ${selectedRecipient} (mỗi lần continue)`);
+            console.log(`[ALWAYS NEW] Đã tạo/xáo trộn lại bộ ${TOTAL_ENVELOPES} mệnh giá mới cho ${selectedRecipient} (mỗi lần continue)`);
 
-            // Tạo 24 envelope với mệnh giá mới
-            for (let i = 1; i <= 24; i++) {
+            // Tạo TOTAL_ENVELOPES envelope với mệnh giá mới
+            for (let i = 1; i <= TOTAL_ENVELOPES; i++) {
                 const envelope = createEnvelope(i);
                 envelope.dataset.fixedAmount = amounts[i - 1];
                 envelope.dataset.number = i;
@@ -1011,9 +1011,12 @@
             
             // Sau animation HOÀN TOÀN XONG → Cleanup
             setTimeout(() => {
-                // Remove animation class
+                // Remove animation class và reset trạng thái "đã mở"
                 existingEnvelopes.forEach(env => {
                     env.classList.remove('shuffling-center');
+                    env.classList.remove('opened');
+                    env.classList.remove('clicked');
+                    env.dataset.opened = 'false';
                     env.style.animationDelay = '';
                 });
                 
@@ -1104,7 +1107,7 @@
                 }
 
                 // Điền còn lại bằng bao thường (random trong min-max)
-                const remaining = 24 - pool.length;
+                const remaining = TOTAL_ENVELOPES - pool.length;
                 for (let j = 0; j < remaining; j++) {
                     // Random tròn chục trong min-max
                     const normal = getRandomTronChuc(settings.min, settings.max);
