@@ -309,6 +309,27 @@
             animation: pulse-dot 2s ease-in-out infinite;
         }
     </style>
+
+
+    <!-- /* Nút X đóng vỏ thiệp */ -->
+    <style>
+        /* Nút X đóng vỏ thiệp */
+        #close-card-cover-btn {
+            backdrop-filter: blur(4px);
+        }
+
+        #close-card-cover-btn:hover {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        #close-card-cover-btn svg {
+            transition: transform 0.3s ease;
+        }
+
+        #close-card-cover-btn:hover svg {
+            transform: rotate(90deg);
+        }
+    </style>
 </head>
 
 <body class="h-full font-body">
@@ -604,8 +625,16 @@
     <!-- Modal Tâm Thư & Lộc Xuân -->
     <!-- Modal 1: Vỏ Thiệp (Cover) -->
     <div id="card-cover-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/70"></div>
+    <div class="absolute inset-0 bg-black/70" id="card-cover-overlay"></div>
         <div class="relative z-10 max-w-4xl w-full">
+
+            <!-- ✨ NÚT X ĐÓNG THIỆP -->
+            <button id="close-card-cover-btn" class="absolute top-2 right-2 sm:top-4 sm:right-4 z-20 w-8 h-8 sm:w-10 sm:h-10 bg-red-900/80 hover:bg-red-800 text-amber-300 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 hover:rotate-90 shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
             <div class="relative bg-gradient-to-b from-red-900/90 to-red-950/95 rounded-md p-1 shadow-2xl outer-card-shadow">
                 <div class="relative rounded-2xl p-6 md:p-8 inner-card-frame">
                     <svg class="decorative-corner corner-tl" viewbox="0 0 80 80">
@@ -1307,27 +1336,39 @@
         // Hàm mở modal Tâm Thư & Lộc Xuân
         // Hàm mở modal Vỏ Thiệp (Cover)
         function openHeartLetterModal(envelopeNumber) {
-            // Lưu envelope number vào biến global để dùng sau
+             // Lưu envelope number vào biến global để dùng sau
             window.currentEnvelopeNumber = envelopeNumber;
             
             // Hiện modal vỏ thiệp
             const coverModal = document.getElementById('card-cover-modal');
             coverModal.classList.remove('hidden');
             
-              // Update tên người gửi trong tâm thư
+            // Update tên người gửi trong tâm thư
             const senderDisplay = document.getElementById('sender-name-display');
             if (senderDisplay && senderName) {
                 senderDisplay.textContent = senderName;
             }
-            
-            
-            // Đánh dấu envelope đã mở
-            const envelopeElement = document.querySelector(`.envelope-item[data-number="${envelopeNumber}"]`);
-            if (envelopeElement && envelopeElement.dataset.opened !== "true") {
-                envelopeElement.classList.add('opened');
-                envelopeElement.dataset.opened = "true";
-            }
         }
+
+        // ===== ĐÓNG VỎ THIỆP (X hoặc click overlay) =====
+        // Đóng khi click nút X
+        document.getElementById('close-card-cover-btn').addEventListener('click', function() {
+            const coverModal = document.getElementById('card-cover-modal');
+            coverModal.style.opacity = '0';
+            coverModal.style.transition = 'opacity 0.3s ease';
+            
+            setTimeout(() => {
+                coverModal.classList.add('hidden');
+                coverModal.style.opacity = '1';
+            }, 300);
+            
+            console.log('❌ Đóng vỏ thiệp (chưa đánh dấu đã mở)');
+        });
+
+        // Đóng khi click overlay (vùng tối bên ngoài)
+        document.getElementById('card-cover-overlay').addEventListener('click', function() {
+            document.getElementById('close-card-cover-btn').click();
+        });
 
         // Hàm khởi tạo canvas cào lì xì
         function initScratchCard(envelopeNumber) {
@@ -1482,9 +1523,20 @@
 
         // ===== MỞ THIỆP → ẨN COVER =====
         // ===== MỞ THIỆP → ĐÓNG COVER → MỞ LETTER =====
+        // ===== MỞ THIỆP → ĐÓNG COVER → MỞ LETTER =====
         document.getElementById('open-card-btn').addEventListener('click', function () {
             const coverModal = document.getElementById('card-cover-modal');
             const letterModal = document.getElementById('heart-letter-modal');
+            
+            // ✅ ĐÁNH DẤU "ĐÃ MỞ" KHI CLICK "MỞ THIỆP"
+            if (window.currentEnvelopeNumber) {
+                const envelopeElement = document.querySelector(`.envelope-item[data-number="${window.currentEnvelopeNumber}"]`);
+                if (envelopeElement && envelopeElement.dataset.opened !== "true") {
+                    envelopeElement.classList.add('opened');
+                    envelopeElement.dataset.opened = "true";
+                    console.log(`✅ Đã đánh dấu lì xì #${window.currentEnvelopeNumber} là "đã mở"`);
+                }
+            }
             
             // Fade out cover modal
             coverModal.style.opacity = '0';
