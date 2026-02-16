@@ -1,6 +1,6 @@
 // <!-- Setting mệnh giá lì xì -->
 // ===== CẤU HÌNH SỐ LƯỢNG LÌ XỈ =====
-const TOTAL_ENVELOPES = 60; // Tổng số lì xì (thay đổi số này để điều chỉnh tổng lì xì)
+const TOTAL_ENVELOPES = 64; // Tổng số lì xì (thay đổi số này để điều chỉnh tổng lì xì)
 
 // ===== XỬ LÝ MODAL CÀI ĐẶT =====
 const settingsBtn = document.getElementById('settings-btn');
@@ -231,7 +231,9 @@ function generateSettingsForm() {
     });
 
     // Real-time update preview khi nhập
+    // Real-time update preview khi nhập (CHỈ FORMAT & UPDATE PREVIEW)
     container.querySelectorAll('input').forEach(input => {
+        // Event: input - CHỈ format số và update preview
         input.addEventListener('input', function (e) {
             // Lưu vị trí con trỏ
             const cursorPosition = this.selectionStart;
@@ -247,8 +249,10 @@ function generateSettingsForm() {
             const lengthDiff = newLength - oldLength;
             this.selectionStart = this.selectionEnd = cursorPosition + lengthDiff;
 
-            // Update preview
+            // Update preview (CHỈ hiển thị, KHÔNG validate)
             const card = this.closest('.setting-card');
+            if (!card) return;
+            
             const minInput = card.querySelector('[data-field="min"]');
             const maxInput = card.querySelector('[data-field="max"]');
             const previewMin = card.querySelector('.preview-min');
@@ -257,59 +261,21 @@ function generateSettingsForm() {
             const minValue = parseNumberInput(minInput.value);
             const maxValue = parseNumberInput(maxInput.value);
 
-            // Format preview
-            previewMin.textContent = formatVND(minValue);
-            previewMax.textContent = formatVND(maxValue);
-
-            // Highlight nếu min >= max (lỗi)
-            // Auto-adjust: Nếu min >= max thì tự động tăng max
-            // Giới hạn Min tối đa 100 triệu
-            const MAX_MIN_VALUE = 100000000;
-            // Giới hạn Max tối đa 200 triệu
-            const MAX_MAX_VALUE = 200000000;
-
-            // Kiểm tra và giới hạn Min
-            let finalMinValue = minValue;
-            if (this.dataset.field === 'min' && minValue > MAX_MIN_VALUE) {
-                finalMinValue = MAX_MIN_VALUE;
-                minInput.value = formatNumberInput(MAX_MIN_VALUE.toString());
-                previewMin.textContent = formatVND(MAX_MIN_VALUE);
-
-                // Flash effect
-                minInput.classList.add('bg-yellow-100');
-                setTimeout(() => minInput.classList.remove('bg-yellow-100'), 500);
-            }
-
-            // Kiểm tra và giới hạn Max
-            let finalMaxValue = maxValue;
-            if (this.dataset.field === 'max' && maxValue > MAX_MAX_VALUE) {
-                finalMaxValue = MAX_MAX_VALUE;
-                maxInput.value = formatNumberInput(MAX_MAX_VALUE.toString());
-                previewMax.textContent = formatVND(MAX_MAX_VALUE);
-
-                // Flash effect
-                maxInput.classList.add('bg-yellow-100');
-                setTimeout(() => maxInput.classList.remove('bg-yellow-100'), 500);
-            }
-
-            // Auto-adjust: Nếu min >= max thì tự động tăng max
-            if (finalMinValue >= finalMaxValue && finalMinValue > 0 && finalMaxValue > 0) {
-                const newMaxValue = Math.min(finalMinValue + 10000, MAX_MAX_VALUE);
-                maxInput.value = formatNumberInput(newMaxValue.toString());
-                previewMax.textContent = formatVND(newMaxValue);
-
-                // Bỏ highlight đỏ vì đã tự sửa
-                previewMin.classList.remove('text-red-600');
-                previewMax.classList.remove('text-red-600');
-
-                // Thêm hiệu ứng flash để user biết đã tự động điều chỉnh
-                maxInput.classList.add('bg-yellow-100');
-                setTimeout(() => {
-                    maxInput.classList.remove('bg-yellow-100');
-                }, 500);
-            } else {
-                previewMin.classList.remove('text-red-600');
-                previewMax.classList.remove('text-red-600');
+            // CHỈ format preview, KHÔNG auto-adjust
+            if (previewMin) previewMin.textContent = formatVND(minValue);
+            if (previewMax) previewMax.textContent = formatVND(maxValue);
+        });
+        
+        // ✅ THÊM EVENT MỚI: blur - Validate khi rời khỏi ô input
+        input.addEventListener('blur', function (e) {
+            const card = this.closest('.setting-card');
+            if (!card) return;
+            
+            const field = this.dataset.field;
+            
+            // Chỉ validate cho min/max
+            if (field === 'min' || field === 'max') {
+                validateMinMax(card);
             }
         });
     });
@@ -753,6 +719,40 @@ settingsModal.addEventListener('click', function (e) {
 
 // Lưu cài đặt
 saveSettings.addEventListener('click', function () {
+    // Reset tất cả error states
+    document.querySelectorAll('.card-error-message').forEach(el => el.remove());
+    document.querySelectorAll('input').forEach(input => {
+        input.classList.remove('border-red-500', 'bg-red-50');
+    });
+    
+    // ✅ VALIDATE TẤT CẢ CÁC CARD
+    let hasError = false;
+    let errorCards = [];
+    
+    document.querySelectorAll('.setting-card').forEach(card => {
+        const isValid = validateMinMax(card, true); // showAlert = true
+        if (!isValid) {
+            hasError = true;
+            const recipientKey = card.dataset.recipient;
+            const recipientName = recipientNames[recipientKey] || recipientKey;
+            errorCards.push(recipientName);
+        }
+    });
+    
+    if (hasError) {
+        // Scroll đến card lỗi đầu tiên
+        const firstErrorCard = document.querySelector('.setting-card input.border-red-500')?.closest('.setting-card');
+        if (firstErrorCard) {
+            firstErrorCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // Alert tổng hợp
+        const errorList = errorCards.join(', ');
+        alert(`⚠️ Vui lòng kiểm tra lại:\n\n${errorList}\n\nCác ô nhập liệu bị lỗi đã được đánh dấu màu đỏ.`);
+        return;
+    }
+    
+    // Thu thập settings (chỉ chạy khi đã validate OK)
     const settings = {};
 
     document.querySelectorAll('.setting-card').forEach(card => {
@@ -784,43 +784,30 @@ saveSettings.addEventListener('click', function () {
         }
     });
 
-    // Validate
-    let hasError = false;
-    Object.keys(settings).forEach(key => {
-        if (settings[key].min >= settings[key].max) {
-            alert(`❌ ${recipientNames[key] || key}: Min phải nhỏ hơn Max!`);
-            hasError = true;
-        }
-    });
-    if (hasError) return;
-
     // Lưu settings
     localStorage.setItem('envelopeSettings', JSON.stringify(settings));
     console.log('[SAVE] Đã lưu envelopeSettings:', settings);
 
-    // XÓA CACHE - Debug chi tiết
-    console.log('[CACHE CLEAR] Bắt đầu xóa cache cho tất cả recipient...');
+    // XÓA CACHE
+    console.log('[CACHE CLEAR] Bắt đầu xóa cache...');
     let clearedCount = 0;
     Object.keys(recipientNames).forEach(key => {
         const cacheKey = `envelopeAmounts_${key}`;
         if (localStorage.getItem(cacheKey)) {
             localStorage.removeItem(cacheKey);
             clearedCount++;
-            console.log(`[CACHE CLEAR] Đã xóa thành công: ${cacheKey}`);
-        } else {
-            console.log(`[CACHE CLEAR] Không có cache cho: ${cacheKey}`);
+            console.log(`[CACHE CLEAR] Đã xóa: ${cacheKey}`);
         }
     });
-    console.log(`[CACHE CLEAR] Tổng cộng xóa ${clearedCount} bộ cache`);
+    console.log(`[CACHE CLEAR] Đã xóa ${clearedCount} bộ cache`);
 
-    // Nếu đang ở màn hình 24 bao → tự động tạo lại bộ mới
+    // Auto-apply nếu đang ở màn hình lì xì
     const envelopesContainer = document.getElementById('envelopes-container');
     if (selectedRecipient && envelopesContainer && !envelopesContainer.classList.contains('hidden')) {
         const storageKey = `envelopeAmounts_${selectedRecipient}`;
         const newAmounts = generateFixedAmountsForRecipient(selectedRecipient);
         localStorage.setItem(storageKey, JSON.stringify(newAmounts));
 
-        // Reload grid
         const envelopesGrid = document.getElementById('envelopes-grid');
         if (envelopesGrid) {
             envelopesGrid.innerHTML = '';
@@ -828,13 +815,20 @@ saveSettings.addEventListener('click', function () {
                 const envelope = createEnvelope(i);
                 envelope.dataset.fixedAmount = newAmounts[i - 1];
                 envelope.dataset.number = i;
+                
+                // Thêm amount display
+                const amountDisplay = document.createElement('div');
+                amountDisplay.className = 'amount-display';
+                amountDisplay.textContent = new Intl.NumberFormat('vi-VN').format(newAmounts[i - 1]);
+                envelope.appendChild(amountDisplay);
+                
                 envelopesGrid.appendChild(envelope);
             }
-            console.log(`[AUTO APPLY] Đã tạo lại bộ mới ngay lập tức cho ${selectedRecipient}`);
-            alert(`✅ Setting mới đã áp dụng ngay!\nBộ ${TOTAL_ENVELOPES} bao đã được tạo lại.`);
+            console.log(`[AUTO APPLY] Đã tạo lại bộ mới cho ${selectedRecipient}`);
+            alert(`✅ Cài đặt mới đã áp dụng ngay!\nBộ ${TOTAL_ENVELOPES} bao đã được tạo lại.`);
         }
     } else {
-        alert('✅ Đã lưu setting!\nSetting mới sẽ áp dụng khi tạo bộ mới.');
+        alert('✅ Đã lưu cài đặt thành công!');
     }
 
     settingsModal.classList.add('hidden');
@@ -1106,3 +1100,119 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 });
 // ===== END AUTO-ADD URL PARAM =====
+
+
+
+// ===== VALIDATE MIN/MAX =====
+// ===== VALIDATE MIN/MAX =====
+function validateMinMax(card, showAlert = false) {
+    const minInput = card.querySelector('[data-field="min"]');
+    const maxInput = card.querySelector('[data-field="max"]');
+    const previewMin = card.querySelector('.preview-min');
+    const previewMax = card.querySelector('.preview-max');
+    
+    if (!minInput || !maxInput) return true;
+    
+    const minValue = parseNumberInput(minInput.value);
+    const maxValue = parseNumberInput(maxInput.value);
+    
+    // Giới hạn
+    const MAX_MIN_VALUE = 100000000;
+    const MAX_MAX_VALUE = 200000000;
+    
+    let isValid = true;
+    let errorMessage = '';
+    
+    // Reset classes trước
+    minInput.classList.remove('border-red-500', 'bg-red-50');
+    maxInput.classList.remove('border-red-500', 'bg-red-50');
+    
+    // 1. Kiểm tra Min không vượt quá giới hạn
+    if (minValue > MAX_MIN_VALUE) {
+        minInput.value = formatNumberInput(MAX_MIN_VALUE.toString());
+        if (previewMin) previewMin.textContent = formatVND(MAX_MIN_VALUE);
+        
+        errorMessage = `Mệnh giá tối thiểu không được vượt quá ${formatVND(MAX_MIN_VALUE)}`;
+        minInput.classList.add('border-red-500', 'bg-red-50');
+        isValid = false;
+    }
+    
+    // 2. Kiểm tra Max không vượt quá giới hạn
+    if (maxValue > MAX_MAX_VALUE) {
+        maxInput.value = formatNumberInput(MAX_MAX_VALUE.toString());
+        if (previewMax) previewMax.textContent = formatVND(MAX_MAX_VALUE);
+        
+        errorMessage = `Mệnh giá tối đa không được vượt quá ${formatVND(MAX_MAX_VALUE)}`;
+        maxInput.classList.add('border-red-500', 'bg-red-50');
+        isValid = false;
+    }
+    
+    // 3. Kiểm tra Min < Max
+    const finalMinValue = parseNumberInput(minInput.value);
+    const finalMaxValue = parseNumberInput(maxInput.value);
+    
+    if (finalMinValue >= finalMaxValue && finalMinValue > 0 && finalMaxValue > 0) {
+        errorMessage = `Tối thiểu (${formatVND(finalMinValue)}) phải nhỏ hơn tối đa (${formatVND(finalMaxValue)})`;
+        
+        // Highlight CẢ HAI ô input
+        minInput.classList.add('border-red-500', 'bg-red-50');
+        maxInput.classList.add('border-red-500', 'bg-red-50');
+        
+        isValid = false;
+    }
+    
+    // Hiển thị lỗi
+    if (!isValid) {
+        if (showAlert) {
+            // Khi Save: scroll đến card lỗi + highlight
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Thêm shake animation
+            card.classList.add('shake-card');
+            setTimeout(() => card.classList.remove('shake-card'), 600);
+            
+            // Show error message trong card
+            showCardError(card, errorMessage);
+        } else {
+            // Khi blur: chỉ highlight nhẹ
+            setTimeout(() => {
+                minInput.classList.remove('border-red-500', 'bg-red-50');
+                maxInput.classList.remove('border-red-500', 'bg-red-50');
+            }, 2000);
+        }
+    }
+    
+    return isValid;
+}
+
+// Hàm hiển thị error message trong card
+function showCardError(card, message) {
+    // Xóa error cũ nếu có
+    const oldError = card.querySelector('.card-error-message');
+    if (oldError) oldError.remove();
+    
+    // Tạo error message mới
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'card-error-message mt-2 p-2 bg-red-100 border border-red-400 text-red-700 text-sm rounded animate-fade-in';
+    errorDiv.innerHTML = `
+        <div class="flex items-start gap-2">
+            <span class="text-lg">⚠️</span>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Thêm vào sau preview
+    const preview = card.querySelector('.text-xs.text-gray-500.bg-gray-50');
+    if (preview) {
+        preview.insertAdjacentElement('afterend', errorDiv);
+    }
+    
+    // Tự động xóa sau 5s
+    setTimeout(() => {
+        errorDiv.style.opacity = '0';
+        errorDiv.style.transition = 'opacity 0.3s';
+        setTimeout(() => errorDiv.remove(), 300);
+    }, 5000);
+}
+// ===== END VALIDATE MIN/MAX =====
+// ===== END VALIDATE MIN/MAX =====
