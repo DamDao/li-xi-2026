@@ -424,17 +424,19 @@ function fireSpread(delay = false) {
 
 
 document.getElementById("launchBtn").addEventListener("click", () => {
-    fireSpread(Math.random() > 0.5); 
-    launch(0);// giữaQ
-    launch(-3.2);// trái nhẹ
-    launch(3.2);// phải nhẹ
-    launch(-5.4);// trái xa
-    launch(5.4);// phải xa
-    launch(-7.4);// trái xa
-    launch(7.4);// phải xa
-    launch(-10.4);// trái xa
-    launch(10.4);// phải xa
+
+  const sequence = [
+    0, -3.2, 3.2, -5.4, 5.4, -7.4, 7.4, -10.4, 10.4
+  ];
+
+  sequence.forEach((angle, i) => {
+    setTimeout(() => {
+      launch(angle);
+    }, i * 220);   // <<< khoảng cách giữa mỗi lần bắn (ms)
+  });
+
 });
+
 
 
 (function petalInit() {
