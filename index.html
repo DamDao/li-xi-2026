@@ -330,6 +330,35 @@
             transform: rotate(90deg);
         }
     </style>
+
+
+    <style>
+        /* Custom scrollbar cho phần lời chúc */
+        /* Custom scrollbar cho phần lời chúc */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #DAA520, #FFD700);
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #FFD700, #DAA520);
+        }
+
+        /* Firefox scrollbar */
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #FFD700 #f1f1f1;
+        }
+    </style>
 </head>
 
 <body class="h-full font-body">
@@ -718,13 +747,19 @@
         
         <!-- Content -->
         <div class="p-6 md:p-8">
-            <!-- Lời chúc -->
-            <div class="text-center mb-3 border-b-2 pb-6 border-tet-gold/30">
-                <h3 class="font-heading text-2xl font-bold text-tet-red mb-3">Chúc Mừng Năm Mới!</h3>
-                <p class="text-gray-700 text-lg leading-relaxed">
-                    Chúc bạn một năm mới tràn đầy sức khỏe, hạnh phúc và thành công. 
-                    Mong rằng những điều tốt đẹp nhất sẽ đến với bạn và gia đình.
-                </p>
+            <!-- Lời chúc với scroll -->
+            <div class="mb-3 border-b-2 pb-6 border-tet-gold/30">
+                <h3 id="letter-greeting" class="font-heading text-2xl font-bold text-tet-red mb-4 text-center">Chúc Mừng Năm Mới!</h3>
+                
+                <!-- Scrollable blessing text -->
+                <div class="max-h-[200px] overflow-y-auto px-4 custom-scrollbar">
+                    <p id="letter-blessing-text" class="text-gray-700 text-base md:text-lg leading-relaxed text-justify">
+                        Chúc bạn một năm mới tràn đầy sức khỏe, hạnh phúc và thành công. 
+                        Mong rằng những điều tốt đẹp nhất sẽ đến với bạn và gia đình.
+                    </p>
+                </div>
+                
+                <p id="letter-closing" class="text-gray-600 italic text-sm md:text-base mt-4 text-right">Trân trọng!</p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1347,6 +1382,29 @@
             const senderDisplay = document.getElementById('sender-name-display');
             if (senderDisplay && senderName) {
                 senderDisplay.textContent = senderName;
+            }
+            
+            // ✨ LOAD LỜI CHÚC RANDOM THEO NGƯỜI NHẬN
+            if (selectedRecipient) {
+                const letterContent = getRandomLetterContent(selectedRecipient);
+                
+                // Update greeting
+                const greetingEl = document.getElementById('letter-greeting');
+                if (greetingEl) {
+                    greetingEl.textContent = letterContent.greeting;
+                }
+                
+                // Update blessing
+                const blessingEl = document.getElementById('letter-blessing-text');
+                if (blessingEl) {
+                    blessingEl.textContent = letterContent.blessing;
+                }
+                
+                // Update closing
+                const closingEl = document.getElementById('letter-closing');
+                if (closingEl) {
+                    closingEl.textContent = letterContent.closing + '!';
+                }
             }
         }
 
