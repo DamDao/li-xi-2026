@@ -1,4 +1,7 @@
 // <!-- Setting mệnh giá lì xì -->
+// ===== CẤU HÌNH SỐ LƯỢNG LÌ XỈ =====
+const TOTAL_ENVELOPES = 60; // Tổng số lì xì (thay đổi số này để điều chỉnh tổng lì xì)
+
 // ===== XỬ LÝ MODAL CÀI ĐẶT =====
 const settingsBtn = document.getElementById('settings-btn');
 const settingsModal = document.getElementById('settings-modal');
@@ -45,7 +48,7 @@ function generateSettingsForm() {
             initialPreviewText = `${initialSpecialCount} bao sẽ có mệnh giá ${formatVND(initialSpecialAmount)} 🎉`;
         }
 
-        const initialNormalCount = 24 - initialSpecialCount;
+        const initialNormalCount = TOTAL_ENVELOPES - initialSpecialCount;
         let initialSpecialListHTML = '';
         if (initialSpecialCount > 0) {
             initialSpecialListHTML = `<div>• <span class="font-semibold text-yellow-600">${initialSpecialCount} bao ĐẶC BIỆT</span>: ${formatVND(initialSpecialAmount)} 🌟</div>`;
@@ -140,7 +143,7 @@ function generateSettingsForm() {
                                             data-field="special-count"
                                             value="${initialSpecialCount}"
                                             min="0"
-                                            max="24"
+                                            max="${TOTAL_ENVELOPES}"
                                             class="special-count-input w-12 text-center border border-gray-300 rounded py-1 text-sm">
                                         <button class="increase-special bg-gray-300 hover:bg-gray-400 w-6 h-6 rounded text-sm font-bold">+</button>
                                     </div>
@@ -166,7 +169,7 @@ function generateSettingsForm() {
                             <!-- Tổng kết -->
                             <div class="mt-3 p-2 bg-green-50 rounded border border-green-200">
                                 <div class="text-xs text-green-700">
-                                    <div class="font-semibold mb-1">📊 Phân bố 24 bao lì xì:</div>
+                                    <div class="font-semibold mb-1">📊 Phân bố ${TOTAL_ENVELOPES} bao lì xì:</div>
                                     <div class="pl-3 space-y-1">
                                         <div>• <span class="normal-count-preview">${initialNormalCount} bao</span> thường: <span class="preview-min">${formatVND(settings.min)}</span> - <span class="preview-max">${formatVND(settings.max)}</span></div>
                                         <div class="special-count-preview-list">
@@ -212,7 +215,7 @@ function generateSettingsForm() {
                                             data-custom-id="${customId}"
                                             value="${custom.count}"
                                             min="0"
-                                            max="24">
+                                            max="${TOTAL_ENVELOPES}">
                                         <button class="increase-custom-special bg-gray-300 hover:bg-gray-400 w-6 h-6 rounded text-sm font-bold">+</button>
                                     </div>
                                 </div>
@@ -415,7 +418,7 @@ if (!isEventDelegationSetup) {
             const btn = e.target.closest('.increase-special');
             const input = btn.parentElement.querySelector('.special-count-input');
             const currentValue = parseInt(input.value) || 0;
-            if (currentValue < 24) {
+            if (currentValue < TOTAL_ENVELOPES) {
                 input.value = currentValue + 1;
                 updateSpecialPreview(btn.closest('.setting-card'));
             }
@@ -480,7 +483,7 @@ if (!isEventDelegationSetup) {
                                         data-custom-id="${customId}"
                                         value="1"
                                         min="0"
-                                        max="24">
+                                        max="${TOTAL_ENVELOPES}">
                                     <button class="increase-custom-special bg-gray-300 hover:bg-gray-400 w-6 h-6 rounded text-sm font-bold">+</button>
                                 </div>
                             </div>
@@ -537,7 +540,7 @@ if (!isEventDelegationSetup) {
             const btn = e.target.closest('.increase-custom-special');
             const input = btn.parentElement.querySelector('.custom-special-count');
             const currentValue = parseInt(input.value) || 0;
-            if (currentValue < 24) {
+            if (currentValue < TOTAL_ENVELOPES) {
                 input.value = currentValue + 1;
                 updateCustomSpecialPreview(btn.closest('.custom-special-item'));
                 updateSpecialPreview(btn.closest('.setting-card'));
@@ -551,7 +554,7 @@ if (!isEventDelegationSetup) {
         if (e.target.classList.contains('special-count-input')) {
             let value = parseInt(e.target.value) || 0;
             if (value < 0) value = 0;
-            if (value > 24) value = 24;
+            if (value > TOTAL_ENVELOPES) value = TOTAL_ENVELOPES;
             e.target.value = value;
             updateSpecialPreview(e.target.closest('.setting-card'));
         }
@@ -633,7 +636,7 @@ if (!isEventDelegationSetup) {
         if (e.target.classList.contains('custom-special-count')) {
             let value = parseInt(e.target.value) || 0;
             if (value < 0) value = 0;
-            if (value > 24) value = 24;
+            if (value > TOTAL_ENVELOPES) value = TOTAL_ENVELOPES;
             e.target.value = value;
 
             const item = e.target.closest('.custom-special-item');
@@ -691,7 +694,7 @@ function updateSpecialPreview(card) {
     });
 
     // Cập nhật số bao thường
-    const normalCount = 24 - totalSpecialCount;
+    const normalCount = TOTAL_ENVELOPES - totalSpecialCount;
     card.querySelector('.normal-count-preview').textContent = `${normalCount} bao`;
 
     // Hiển thị danh sách đặc biệt
@@ -710,9 +713,9 @@ function updateSpecialPreview(card) {
 
     specialList.innerHTML = specialHTML;
 
-    // Cảnh báo nếu tổng > 24
-    if (totalSpecialCount > 24) {
-        specialList.innerHTML += `<div class="text-red-600 font-bold mt-1">⚠️ Tổng số bao đặc biệt vượt quá 24!</div>`;
+    // Cảnh báo nếu tổng vượt quá limit
+    if (totalSpecialCount > TOTAL_ENVELOPES) {
+        specialList.innerHTML += `<div class="text-red-600 font-bold mt-1">⚠️ Tổng số bao đặc biệt vượt quá ${TOTAL_ENVELOPES}!</div>`;
     }
 }
 // ================================================
@@ -821,14 +824,14 @@ saveSettings.addEventListener('click', function () {
         const envelopesGrid = document.getElementById('envelopes-grid');
         if (envelopesGrid) {
             envelopesGrid.innerHTML = '';
-            for (let i = 1; i <= 24; i++) {
+            for (let i = 1; i <= TOTAL_ENVELOPES; i++) {
                 const envelope = createEnvelope(i);
                 envelope.dataset.fixedAmount = newAmounts[i - 1];
                 envelope.dataset.number = i;
                 envelopesGrid.appendChild(envelope);
             }
             console.log(`[AUTO APPLY] Đã tạo lại bộ mới ngay lập tức cho ${selectedRecipient}`);
-            alert('✅ Setting mới đã áp dụng ngay!\nBộ 24 bao đã được tạo lại.');
+            alert(`✅ Setting mới đã áp dụng ngay!\nBộ ${TOTAL_ENVELOPES} bao đã được tạo lại.`);
         }
     } else {
         alert('✅ Đã lưu setting!\nSetting mới sẽ áp dụng khi tạo bộ mới.');

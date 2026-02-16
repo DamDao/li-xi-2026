@@ -504,8 +504,8 @@
             <!-- Envelopes Grid (hidden by default) -->
             <div id="envelopes-container" class="hidden max-w-6xl mx-auto w-full px-2 sm:px-4 ">
                 <div class="text-center mb-8">
-                    <h2 class="font-heading text-xl md:text-3xl font-bold gold-shimmer mb-4">
-                        24 Bao Lì Xì Yêu Thương
+                    <h2 class="font-heading text-xl md:text-3xl font-bold gold-shimmer mb-4" id="envelopes-title">
+                        <span id="total-envelopes-count">60</span> Bao Lì Xì Yêu Thương
                     </h2>
                     <p class="text-tet-cream/70 text-sm md:text-base">
                         Chọn một bao lì xì để gửi trao yêu thương
@@ -771,6 +771,7 @@
     </div>
     <script src="src/js/helper.js"></script>
     <script src="src/js/script.js"></script>
+    <script src="src/js/setting.js"></script>
     <script>
         const defaultConfig = {
             tagline: "Gửi trao yêu thương – Nhận lộc an khang",
@@ -944,7 +945,7 @@
             if (envelopesGrid.classList.contains("show-amounts")) {
                 btn.textContent = "🙈 Ẩn mệnh giá";
             } else {
-                btn.textContent = "💰 Hiển thị mệnh giá";
+                btn.textContent = "💰 Hiện mệnh giá";
             }
         });
 
@@ -1041,7 +1042,7 @@
                 setTimeout(() => {
                     btn.disabled = false;
                     btn.style.opacity = '1';
-                    btn.textContent = '🔄 Xáo trộn mệnh giá';
+                    btn.textContent = '🔄 Xáo trộn';
                 }, 500);
                 
             }, totalDuration + 100); // Thêm 100ms buffer
@@ -1518,15 +1519,18 @@
                 document.getElementById("selection-display").classList.add("hidden");
                 document.getElementById("continue-btn").classList.add("hidden");
                 
-                // Hiển thị container 24 bao lì xì
+                // Hiển thị container TOTAL_ENVELOPES bao lì xì
                 const envelopesContainer = document.getElementById("envelopes-container");
                 envelopesContainer.classList.remove("hidden");
                 
-                // Tạo 24 bao lì xì
+                // Cập nhật tiêu đề với số lượng lì xì
+                document.getElementById('total-envelopes-count').textContent = TOTAL_ENVELOPES;
+                
+                // Tạo TOTAL_ENVELOPES bao lì xì
                 const envelopesGrid = document.getElementById("envelopes-grid");
                 envelopesGrid.innerHTML = "";
                 
-                for (let i = 1; i <= 24; i++) {
+                for (let i = 1; i <= TOTAL_ENVELOPES; i++) {
                     envelopesGrid.appendChild(createEnvelope(i));
                 }
                 
@@ -1604,8 +1608,6 @@
             });
         }
     </script>
-
-    <script src="src/js/setting.js"></script>
 
 
     <script>
