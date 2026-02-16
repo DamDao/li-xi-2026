@@ -437,5 +437,98 @@ document.getElementById("launchBtn").addEventListener("click", () => {
 });
 
 
+(function petalInit() {
+  const layer = document.getElementById("petal-layer");
+  if (!layer) return;
 
+  function makePetalSVG(uid) {
+    const colors = [
+      { base: "#ffd700", light: "#fff6b0" },
+      { base: "#ffcc00", light: "#ffe680" },
+      { base: "#ffdb58", light: "#fff1a0" },
+      { base: "#ffe135", light: "#fff3a5" }
+    ];
+    const colorSet = colors[uid % colors.length];
+
+    const shapes = [
+      `M12,5 Q20,10 20,20 Q12,15 5,20 Q5,10 12,5Z`,
+      `M20,6 Q25,13 20,20 Q15,13 20,6Z`,
+      `M20,8 Q23,13 20,18 Q17,13 20,8Z`,
+      `M12,3 Q20,12 12,22 Q5,12 12,3Z`
+    ];
+
+    const shape = shapes[uid % shapes.length];
+
+    return `
+    <svg viewBox="0 0 40 25">
+      <defs>
+        <radialGradient id="g${uid}">
+          <stop offset="0%" stop-color="${colorSet.light}"/>
+          <stop offset="100%" stop-color="${colorSet.base}"/>
+        </radialGradient>
+      </defs>
+      <path d="${shape}" fill="url(#g${uid})"/>
+    </svg>`;
+  }
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+
+  let uid = 0;
+
+  function spawnPetal() {
+    uid++;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    const w = rand(18, 30);
+    const x = rand(0, vw);
+    const y = rand(-40, -10);
+
+    const wrap = document.createElement("div");
+    wrap.className = "petal-wrap";
+    wrap.style.cssText = `
+      left:${x}px;
+      top:${y}px;
+      width:${w}px;
+      height:${w*0.9}px;
+      filter:drop-shadow(0 4px 6px rgba(255,215,0,0.3));
+      animation:petalFloatAndDrift ${rand(14,22)}s linear forwards;
+      --drift-x-early:${rand(-60,60)}px;
+      --drift-x-mid:${rand(-80,80)}px;
+      --drift-x-late:${rand(-60,60)}px;
+      --drift-x-final:${rand(-40,40)}px;
+      --drift-x-end:${rand(-30,30)}px;
+      --drift-x-pull:${rand(-20,20)}px;
+    `;
+
+    const spin = document.createElement("div");
+    spin.style.cssText = `
+      width:100%;
+      height:100%;
+      animation:
+        petalGentleSway ${rand(4,7)}s ease-in-out infinite,
+        petalGentleRotate ${rand(12,20)}s linear infinite;
+    `;
+
+    spin.innerHTML = makePetalSVG(uid);
+    wrap.appendChild(spin);
+    layer.appendChild(wrap);
+
+    setTimeout(() => wrap.remove(), 26000);
+  }
+
+  function loop() {
+    const count = Math.random() < 0.5 ? 1 : 2;
+    for (let i = 0; i < count; i++) {
+      setTimeout(spawnPetal, i * 300);
+    }
+    setTimeout(loop, rand(1600, 2200));
+  }
+
+  /* Spawn ngay khi load */
+  for (let i = 0; i < 4; i++) spawnPetal();
+
+  loop();
+})();
 

@@ -994,3 +994,71 @@ body {
         grid-template-columns: repeat(5, minmax(0, 1fr));
     }
 }
+
+
+
+/* ================= HOA MAI RƠI ================= */
+
+#petal-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    overflow: hidden;
+    perspective: 1500px;
+}
+
+.petal-wrap {
+    position: absolute;
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+/* Rơi + drift */
+@keyframes petalFloatAndDrift {
+    0% {
+        transform: translate(0, -50px) rotate(0deg) scale(1);
+        opacity: 0;
+    }
+    5% { opacity: 1; }
+
+    15% {
+        transform: translate(var(--drift-x-early), 10vh) rotate(45deg) scale(0.98);
+    }
+
+    30% {
+        transform: translate(var(--drift-x-mid), 30vh) rotate(90deg) scale(0.96);
+    }
+
+    50% {
+        transform: translate(var(--drift-x-late), 55vh) rotate(160deg) scale(0.94);
+    }
+
+    70% {
+        transform: translate(var(--drift-x-final), 75vh) rotate(220deg) scale(0.92);
+    }
+
+    90% {
+        transform: translate(var(--drift-x-end), 95vh) rotate(300deg) scale(0.9);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(var(--drift-x-pull), 110vh) rotate(360deg) scale(0.88);
+        opacity: 0;
+    }
+}
+
+/* Lắc nhẹ */
+@keyframes petalGentleSway {
+    0%,100% { transform: translateX(0); }
+    50% { transform: translateX(8px); }
+}
+
+/* Xoay */
+@keyframes petalGentleRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ================= END HOA MAI RƠI ================= */

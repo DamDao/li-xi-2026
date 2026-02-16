@@ -116,10 +116,54 @@ function generateSettingsForm() {
                                 
                         </div>
                         
-                        <!-- Preview -->
-                        <div class="text-xs text-gray-500 bg-gray-50 p-2 rounded">
-                            💡 Random từ: <strong class="preview-min">${formatVND(settings.min)}</strong> → <strong class="preview-max">${formatVND(settings.max)}</strong>
+                        <!-- Preview Random Range với nút toggle -->
+                        <div class="text-xs text-gray-500 bg-gray-50 p-2 rounded flex items-center justify-between">
+                            <span>💡 Random từ: <strong class="preview-min">${formatVND(settings.min)}</strong> → <strong class="preview-max">${formatVND(settings.max)}</strong></span>
+                            <button class="toggle-distribution text-blue-600 hover:text-blue-800 font-semibold underline cursor-pointer text-xs ml-2">
+                                Thể lệ ▼
+                            </button>
                         </div>
+
+                        <!-- ✨ Distribution Preview - MẶC ĐỊNH ẨN -->
+                        ${(() => {
+                            const minTron = Math.ceil(settings.min / 10000) * 10000;
+                            const maxTron = Math.floor(settings.max / 10000) * 10000;
+                            const range = maxTron - minTron;
+                            const threshold1 = minTron + Math.floor((range * 0.5) / 10000) * 10000;
+                            const threshold2 = minTron + Math.floor((range * 0.8) / 10000) * 10000;
+                            
+                            return `
+                            <div class="distribution-preview hidden text-xs bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-lg mt-2 border border-blue-200">
+                                <div class="font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                                    <span>📊</span>
+                                    <span>Phân bố thông minh:</span>
+                                </div>
+                                <div class="space-y-1.5 pl-1">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-20 bg-gradient-to-r from-green-400 to-green-500 h-2 rounded-full"></div>
+                                        <span class="text-gray-600">
+                                            <span class="font-semibold text-green-700">50%</span>: 
+                                            <span class="preview-dist-low">${formatVND(minTron)}-${formatVND(threshold1)}</span>
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-12 bg-gradient-to-r from-yellow-400 to-yellow-500 h-2 rounded-full"></div>
+                                        <span class="text-gray-600">
+                                            <span class="font-semibold text-yellow-700">30%</span>: 
+                                            <span class="preview-dist-medium">${formatVND(threshold1 + 10000)}-${formatVND(threshold2)}</span>
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 bg-gradient-to-r from-red-400 to-red-500 h-2 rounded-full"></div>
+                                        <span class="text-gray-600">
+                                            <span class="font-semibold text-red-700">20%</span>: 
+                                            <span class="preview-dist-high">${formatVND(threshold2 + 10000)}-${formatVND(maxTron)}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+                        })()}
                         
                         <!-- Advanced Options -->
                         <div class="advanced-options hidden mt-3 pt-3 border-t border-gray-200">
@@ -264,6 +308,9 @@ function generateSettingsForm() {
             // CHỈ format preview, KHÔNG auto-adjust
             if (previewMin) previewMin.textContent = formatVND(minValue);
             if (previewMax) previewMax.textContent = formatVND(maxValue);
+            
+            // ✨ THÊM: Update distribution preview
+            updateDistributionPreview(card);
         });
         
         // ✅ THÊM EVENT MỚI: blur - Validate khi rời khỏi ô input
@@ -350,6 +397,44 @@ if (!isEventDelegationSetup) {
             return;
         }
 
+        // ✨ THÊM: Toggle distribution preview
+        if (e.target.closest('.toggle-distribution')) {
+            const btn = e.target.closest('.toggle-distribution');
+            const card = btn.closest('.setting-card');
+            const distributionPreview = card.querySelector('.distribution-preview');
+            
+            if (distributionPreview) {
+                if (distributionPreview.classList.contains('hidden')) {
+                    // Hiện
+                    distributionPreview.classList.remove('hidden');
+                    btn.innerHTML = 'Thể lệ ▲';
+                    
+                    // Animation fade in
+                    distributionPreview.style.opacity = '0';
+                    distributionPreview.style.maxHeight = '0';
+                    distributionPreview.style.overflow = 'hidden';
+                    distributionPreview.style.transition = 'all 0.3s ease';
+                    
+                    setTimeout(() => {
+                        distributionPreview.style.opacity = '1';
+                        distributionPreview.style.maxHeight = '200px';
+                    }, 10);
+                } else {
+                    // Ẩn
+                    distributionPreview.style.opacity = '0';
+                    distributionPreview.style.maxHeight = '0';
+                    
+                    setTimeout(() => {
+                        distributionPreview.classList.add('hidden');
+                        btn.innerHTML = 'Thể lệ ▼';
+                        distributionPreview.style.maxHeight = '';
+                        distributionPreview.style.overflow = '';
+                    }, 300);
+                }
+            }
+            return;
+        }
+        
         // Toggle advanced options
         if (e.target.closest('.toggle-advanced')) {
             const toggleBtn = e.target.closest('.toggle-advanced');
@@ -1216,3 +1301,40 @@ function showCardError(card, message) {
 }
 // ===== END VALIDATE MIN/MAX =====
 // ===== END VALIDATE MIN/MAX =====
+
+
+// ===== UPDATE DISTRIBUTION PREVIEW =====
+function updateDistributionPreview(card) {
+    const minInput = card.querySelector('[data-field="min"]');
+    const maxInput = card.querySelector('[data-field="max"]');
+    
+    if (!minInput || !maxInput) return;
+    
+    const minValue = parseNumberInput(minInput.value);
+    const maxValue = parseNumberInput(maxInput.value);
+    
+    // Làm tròn 10k
+    const minTron = Math.ceil(minValue / 10000) * 10000;
+    const maxTron = Math.floor(maxValue / 10000) * 10000;
+    const range = maxTron - minTron;
+    
+    // Tính các mốc phân chia (tròn 10k)
+    const threshold1 = minTron + Math.floor((range * 0.5) / 10000) * 10000; // 50%
+    const threshold2 = minTron + Math.floor((range * 0.8) / 10000) * 10000; // 80%
+    
+    // Update text
+    const previewLow = card.querySelector('.preview-dist-low');
+    const previewMedium = card.querySelector('.preview-dist-medium');
+    const previewHigh = card.querySelector('.preview-dist-high');
+    
+    if (previewLow) {
+        previewLow.textContent = `${formatVND(minTron)}-${formatVND(threshold1)}`;
+    }
+    if (previewMedium) {
+        previewMedium.textContent = `${formatVND(threshold1 + 10000)}-${formatVND(threshold2)}`;
+    }
+    if (previewHigh) {
+        previewHigh.textContent = `${formatVND(threshold2 + 10000)}-${formatVND(maxTron)}`;
+    }
+}
+// ===== END UPDATE DISTRIBUTION PREVIEW =====

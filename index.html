@@ -398,6 +398,32 @@
             }
         }
     </style>
+
+    <style>
+        /* Smooth transition cho distribution preview */
+        .distribution-preview {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .distribution-preview.hidden {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            border-width: 0;
+        }
+
+        /* Hover effect cho nút Thể lệ */
+        .toggle-distribution {
+            transition: all 0.2s ease;
+        }
+
+        .toggle-distribution:hover {
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 
 <body class="h-full font-body">
@@ -635,6 +661,9 @@
 
                 <button id="launchBtn" title="Bắn pháo hoa">🎆</button>
                 <canvas id="fireworksCanvas"></canvas>
+                
+                <!-- ── CÁNH MAI RƠI layer ── -->
+                <div id="petal-layer"></div>
 
                 <p id="footer-text" class="font-heading text-tet-gold text-xl md:text-2xl mb-2">
                     Lộc Xuân 2026
@@ -773,66 +802,66 @@
         </div>
     </div>
 
-<!-- Modal 2: Nội dung Tâm Thư -->
-<div id="heart-letter-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/70"></div>
-    <div class="relative bg-gradient-to-br from-red-50 to-amber-50 w-full max-w-4xl rounded-xl shadow-xl overflow-hidden border-2 border-tet-gold">
-        
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-tet-red to-tet-red-light py-4 px-6 text-center">
-            <h2 class="font-heading text-3xl font-bold text-tet-gold">TÂM THƯ & LỘC XUÂN</h2>
-            <p class="text-tet-cream/90 text-sm mt-1">Xuân Ất Tỵ 2025 - An Khang Thịnh Vượng</p>
-        </div>
-        
-        <!-- Content -->
-        <div class="p-6 md:p-8">
-            <!-- Lời chúc với scroll -->
-            <div class="mb-3 border-b-2 pb-6 border-tet-gold/30">
-                <h3 id="letter-greeting" class="font-heading text-2xl font-bold text-tet-red mb-4 text-center">Chúc Mừng Năm Mới!</h3>
-                
-                <!-- Scrollable blessing text -->
-                <div class="max-h-[200px] overflow-y-auto px-4 custom-scrollbar">
-                    <p id="letter-blessing-text" class="text-gray-700 text-base md:text-lg leading-relaxed text-justify">
-                        Chúc bạn một năm mới tràn đầy sức khỏe, hạnh phúc và thành công. 
-                        Mong rằng những điều tốt đẹp nhất sẽ đến với bạn và gia đình.
-                    </p>
-                </div>
-                
-                <p id="letter-closing" class="text-gray-600 italic text-sm md:text-base mt-4 text-right">Trân trọng!</p>
+    <!-- Modal 2: Nội dung Tâm Thư -->
+    <div id="heart-letter-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/70"></div>
+        <div class="relative bg-gradient-to-br from-red-50 to-amber-50 w-full max-w-4xl rounded-xl shadow-xl overflow-hidden border-2 border-tet-gold">
+            
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-tet-red to-tet-red-light py-4 px-6 text-center">
+                <h2 class="font-heading text-3xl font-bold text-tet-gold">TÂM THƯ & LỘC XUÂN</h2>
+                <p class="text-tet-cream/90 text-sm mt-1">Xuân Ất Tỵ 2025 - An Khang Thịnh Vượng</p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Phần cào lộc xuân -->
-                <div>
-                    <div class="rounded-lg p-2">
-                        <p class="text-sm text-gray-600 italic mb-1">Chúc mừng năm mới Ất Tỵ 2025</p>
-                        <div id="scratch-area" class="bg-gradient-to-r from-gray-200 to-gray-300 h-16 rounded-lg relative overflow-hidden flex items-center justify-center">
-                            <!-- Nội dung bên dưới - số tiền -->
-                            <div id="lucky-amount" class="absolute inset-0 flex items-center justify-center text-xl md:text-2xl font-bold text-tet-red">
-                                <span id="money-display"></span>
+            <!-- Content -->
+            <div class="p-6 md:p-8">
+                <!-- Lời chúc với scroll -->
+                <div class="mb-3 border-b-2 pb-6 border-tet-gold/30">
+                    <h3 id="letter-greeting" class="font-heading text-2xl font-bold text-tet-red mb-4 text-center">Chúc Mừng Năm Mới!</h3>
+                    
+                    <!-- Scrollable blessing text -->
+                    <div class="max-h-[200px] overflow-y-auto px-4 custom-scrollbar">
+                        <p id="letter-blessing-text" class="text-gray-700 text-base md:text-lg leading-relaxed text-justify">
+                            Chúc bạn một năm mới tràn đầy sức khỏe, hạnh phúc và thành công. 
+                            Mong rằng những điều tốt đẹp nhất sẽ đến với bạn và gia đình.
+                        </p>
+                    </div>
+                    
+                    <p id="letter-closing" class="text-gray-600 italic text-sm md:text-base mt-4 text-right">Trân trọng!</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Phần cào lộc xuân -->
+                    <div>
+                        <div class="rounded-lg p-2">
+                            <p class="text-sm text-gray-600 italic mb-1">Chúc mừng năm mới Ất Tỵ 2025</p>
+                            <div id="scratch-area" class="bg-gradient-to-r from-gray-200 to-gray-300 h-16 rounded-lg relative overflow-hidden flex items-center justify-center">
+                                <!-- Nội dung bên dưới - số tiền -->
+                                <div id="lucky-amount" class="absolute inset-0 flex items-center justify-center text-xl md:text-2xl font-bold text-tet-red">
+                                    <span id="money-display"></span>
+                                </div>
+                                <!-- Canvas cào -->
+                                <canvas id="scratch-canvas"></canvas>
                             </div>
-                            <!-- Canvas cào -->
-                            <canvas id="scratch-canvas"></canvas>
                         </div>
+                    </div>
+                    
+                    <!-- Người gửi -->
+                    <div class="text-end">
+                        <p class="text-sm text-gray-600 italic mb-1">Người gửi</p>
+                        <p id="sender-name-display" class="font-dancing text-3xl font-bold text-tet-red mb-1">Đàm Đình Đào</p>
                     </div>
                 </div>
                 
-                <!-- Người gửi -->
-                <div class="text-end">
-                    <p class="text-sm text-gray-600 italic mb-1">Người gửi</p>
-                    <p id="sender-name-display" class="font-dancing text-3xl font-bold text-tet-red mb-1">Đàm Đình Đào</p>
+                <!-- Nút đóng -->
+                <div class="text-center mt-5">
+                    <button id="close-modal" class="bg-tet-red text-tet-cream font-semibold px-8 py-3 rounded-full hover:bg-tet-red-light transition-all duration-300">
+                        Trân Trọng Cảm Ơn
+                    </button>
                 </div>
-            </div>
-            
-            <!-- Nút đóng -->
-            <div class="text-center mt-5">
-                <button id="close-modal" class="bg-tet-red text-tet-cream font-semibold px-8 py-3 rounded-full hover:bg-tet-red-light transition-all duration-300">
-                    Trân Trọng Cảm Ơn
-                </button>
             </div>
         </div>
     </div>
-</div>
 
 
     <!-- Modal Cài Đặt Mệnh Giá -->
